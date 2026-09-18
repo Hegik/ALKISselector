@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Flurstück (gestrichelt), Gebäude (rot, ALKIS-Signatur) und Haken (Übernahme) -->
+  <rect x="1.5" y="1.5" width="21" height="21" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="2.5 1.5"/>
+  <path d="M5 19 V10 L10.5 5.5 L16 10 V19 Z" fill="#f4b7a8" stroke="#b3261e" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="17.5" cy="17.5" r="5" fill="#1e8e3e"/>
+  <path d="M15 17.6 L16.9 19.4 L20.2 15.8" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

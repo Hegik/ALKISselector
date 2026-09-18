@@ -1,0 +1,136 @@
+# Übersetzung ALKIS-Gebäudefunktion (Klartext) -> OSM building=*
+# Format: ALKIS-Wert;building-Wert   (Wert "-" = kein eigenständiges Gebäude, wird nicht angeboten)
+# Groß-/Kleinschreibung wird beim Vergleich ignoriert. Die Tabelle ist im Plugin pro Profil editierbar.
+#
+# --- Wohnen
+Wohngebäude;residential
+Wohnhaus;house
+Wohnheim;dormitory
+Studenten-, Schülerwohnheim;dormitory
+Schwesternwohnheim;dormitory
+Kinderheim;residential
+Seniorenheim;residential
+Gemischt genutztes Gebäude mit Wohnen;residential
+Wohngebäude mit Handel und Dienstleistungen;residential
+Wohngebäude mit Gewerbe und Industrie;residential
+Land- und forstwirtschaftliches Wohngebäude;farm
+Land- und forstwirtschaftliches Wohn- und Betriebsgebäude;farm
+Wohn- und Betriebsgebäude;farm
+Forsthaus;house
+Wochenendhaus;cabin
+Gartenhaus;shed
+Ferienhaus;cabin
+# --- Nebengebäude, Parken
+Garage;garage
+Doppelgarage;garages
+Sammelgarage;garages
+Gebäude zum Parken;garage
+Parkhaus;parking
+Parkdeck;parking
+Carport;carport
+Überdachung;roof
+Schuppen;shed
+Gebäude für Erholungszwecke;yes
+Gebäude zur Freizeitgestaltung;yes
+# --- Handel, Gewerbe, Industrie
+Gebäude für Handel und Dienstleistungen;commercial
+Gebäude für Wirtschaft oder Gewerbe;commercial
+Bürogebäude;office
+Kreditinstitut;commercial
+Versicherung;commercial
+Geschäftsgebäude;commercial
+Kaufhaus;retail
+Einkaufszentrum;retail
+Markthalle;retail
+Laden;retail
+Kiosk;kiosk
+Apotheke;retail
+Gebäude für Beherbergung;hotel
+Hotel, Motel, Pension;hotel
+Jugendherberge;hotel
+Gebäude für Bewirtung;commercial
+Gaststätte, Restaurant;commercial
+Gebäude für Gewerbe und Industrie;industrial
+Produktionsgebäude;industrial
+Fabrik;industrial
+Betriebsgebäude;industrial
+Brauerei;industrial
+Werkstatt;industrial
+Lagerhalle, Lagerschuppen, Lagerhaus;warehouse
+Speditionsgebäude;warehouse
+Tankstelle;commercial
+Waschstraße, Waschanlage, Waschhalle;commercial
+Silo;silo
+# --- Versorgung, Entsorgung
+Gebäude zur Versorgung;service
+Gebäude zur Entsorgung;service
+Gebäude zur Energieversorgung;service
+Umformer;service
+Umspannwerk;service
+Gebäude zur Wasserversorgung;service
+Pumpstation;service
+Pumpwerk (nicht für Wasserversorgung);service
+# --- Land- und Forstwirtschaft
+Gebäude für Land- und Forstwirtschaft;farm_auxiliary
+Land- und forstwirtschaftliches Betriebsgebäude;farm_auxiliary
+Scheune;barn
+Stall;farm_auxiliary
+Scheune und Stall;farm_auxiliary
+Stall für Tiergroßhaltung;farm_auxiliary
+Treibhaus, Gewächshaus;greenhouse
+Treibhaus;greenhouse
+Gewächshaus;greenhouse
+# --- Öffentliche Zwecke
+Gebäude für öffentliche Zwecke;public
+Verwaltungsgebäude;government
+Rathaus;public
+Gericht;government
+Polizei;public
+Feuerwehr;fire_station
+Gebäude für Sicherheit und Ordnung;public
+Kaserne;military
+Gebäude für Bildung und Forschung;yes
+Allgemein bildende Schule;school
+Berufsbildende Schule;school
+Hochschulgebäude (Fachhochschule, Universität);university
+Kindergarten;kindergarten
+Kindertagesstätte;kindergarten
+Bibliothek, Bücherei;yes
+Gebäude für kulturelle Zwecke;yes
+Museum;yes
+Theater, Oper;yes
+Gebäude für soziale Zwecke;yes
+Gebäude für Gesundheitswesen;yes
+Krankenhaus;hospital
+Friedhofsgebäude;yes
+Trauerhalle;yes
+Toilette;toilets
+Bahnhofsgebäude;train_station
+Empfangsgebäude;train_station
+Sport-, Turnhalle;sports_hall
+Hallenbad;sports_centre
+Gebäude für Sportzwecke;sports_centre
+# --- Religion
+Kirche;church
+Kapelle;chapel
+Kloster;monastery
+Synagoge;synagogue
+Moschee;mosque
+Tempel;temple
+Gebäude für religiöse Zwecke;religious
+# --- Sonstiges
+Sonstiges;yes
+Nach Quellenlage nicht zu spezifizieren;yes
+Hütte (mit Übernachtungsmöglichkeit);hut
+Hütte (ohne Übernachtungsmöglichkeit);hut
+Schutzhütte;hut
+# --- Keine eigenständigen Gebäude (werden nicht angeboten)
+Auskragender Geschossteil;-
+Durchfahrt im Gebäude;-
+Durchfahrt an überbautem Verkehrsweg;-
+Hochhausgebäudeteil;-
+Tiefgarage;-
+Schornstein;-
+Tank;-
+Kirchturm, Glockenturm;-
+Bauteil;-
