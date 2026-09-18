@@ -38,6 +38,8 @@ import de.alkisselector.decision.Recommendation;
  * Zeichnet die ALKIS-Umrisse der aktuellen Sitzung farbcodiert über die Karte:
  * grün = Übernahme empfohlen, orange = Diskrepanz, gelb = ungeprüft, violett = manuell,
  * grau = identisch/erledigt, rot gestrichelt = OSM-Gebäude ohne ALKIS-Gegenstück.
+ * Wurde ein Umriss an Nachbargebäude angepasst, zeigt die kräftige Linie die angepasste Form und
+ * eine dünne gestrichelte Linie den ursprünglichen ALKIS-Umriss.
  */
 public class AlkisPreviewLayer extends Layer {
 
@@ -58,6 +60,8 @@ public class AlkisPreviewLayer extends Layer {
     private static final Stroke SELECTED = new BasicStroke(4f);
     private static final Stroke DASHED = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f,
             new float[] {6f, 4f}, 0f);
+    private static final Stroke THIN_DASHED = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f,
+            new float[] {3f, 3f}, 0f);
 
     /** Neuer Layer. */
     public AlkisPreviewLayer() {
@@ -83,7 +87,9 @@ public class AlkisPreviewLayer extends Layer {
     }
 
     private static void draw(Graphics2D g, MapView mv, Candidate c, boolean selected) {
-        Path2D path = c.getMatchClass() == MatchClass.NUR_OSM ? osmPath(mv, c.getOsmOnly().getPrimitive()) : alkisPath(mv, c);
+        boolean fitted = !c.getFittedOutlines().isEmpty();
+        Path2D path = c.getMatchClass() == MatchClass.NUR_OSM ? osmPath(mv, c.getOsmOnly().getPrimitive())
+                : ringsPath(mv, fitted ? c.getFittedOutlines() : c.getOutlines());
         if (path == null) {
             return;
         }
@@ -100,11 +106,16 @@ public class AlkisPreviewLayer extends Layer {
         g.setStroke(selected ? SELECTED
                 : (c.getMatchClass() == MatchClass.NUR_OSM || c.getStatus() == Candidate.Status.VERWORFEN ? DASHED : NORMAL));
         g.draw(path);
+        if (fitted && c.getStatus() == Candidate.Status.OFFEN) {
+            // ursprünglicher ALKIS-Umriss zum Vergleich (vor der Anpassung an Nachbargebäude)
+            g.setStroke(THIN_DASHED);
+            g.draw(ringsPath(mv, c.getOutlines()));
+        }
     }
 
-    private static Path2D alkisPath(MapView mv, Candidate c) {
+    private static Path2D ringsPath(MapView mv, List<List<LatLon>> rings) {
         Path2D path = new Path2D.Double(Path2D.WIND_EVEN_ODD);
-        for (List<LatLon> ring : c.getOutlines()) {
+        for (List<LatLon> ring : rings) {
             boolean first = true;
             for (LatLon ll : ring) {
                 Point2D p = mv.getPoint2D(ll);

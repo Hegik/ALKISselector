@@ -18,8 +18,9 @@ einen Dienst oder ein Land gebunden.
 | **OSM-Vergleich** | Einstufung *neu / identisch / abweichend / komplex / nur OSM* (IoU, Hausdorff-Distanz) |
 | **Luftbild-Check** | Kantenabgleich mit dem Orthophoto, berücksichtigt Bildversatz, Dachüberstand und Brandwände |
 | **Hybride Entscheidung** | Enter = übernehmen, Umschalt+Enter = trotz Diskrepanz, Entf = verwerfen, Leertaste = überspringen |
+| **Anpassung an Nachbarn** | Neue Gebäude schließen ohne Überlappung und ohne Spalt an vorhandene OSM-Gebäude an (gemeinsame Knoten, Überstand wird abgeschnitten) |
 | **Neuanlage mit Attributen** | `building=*` aus der Gebäudefunktion, Adresse aus der Lagebezeichnung, Name, Geschosse; im Dialog editierbar |
-| **Geometrie ersetzen** | Bei abweichenden Gebäuden bleiben ID, Historie und Tags erhalten (über utilsplugin2), Tags werden nur ergänzt |
+| **Geometrie ersetzen** | Bei abweichenden Gebäuden bleiben ID, Historie und Tags erhalten, Tags werden nur ergänzt. Verbindungen zu angrenzenden Gebäuden, Wegen und Eingängen bleiben erhalten |
 | **Flurstücke** | Nur als Hintergrundebene, werden nie übernommen |
 | **Profile** | Beliebige WFS/WMS-Dienste. Mitgeliefert: NRW, Beispiel Sachsen in `docs/` |
 | **Evaluierung** | Jede Entscheidung landet als CSV-Zeile im Entscheidungsprotokoll |
@@ -39,16 +40,24 @@ eigene Gradle-Installation ist nicht nötig.
 ./gradlew test -Donline=true   # zusätzlich Online-Tests gegen die NRW-Dienste inkl. Kalibrierung
 ```
 
+In **PowerShell** Argumente mit Punkt in einfache Anführungszeichen setzen, sonst trennt PowerShell
+am Punkt:
+
+```powershell
+./gradlew runJosm '-Pjosm.args=--language=de --download=51.9612,7.6075,51.9635,7.6120'
+./gradlew test '-Donline=true'
+```
+
 Installation in ein normales JOSM: `alkisselector.jar` in den JOSM-Plugin-Ordner kopieren und in den
-Einstellungen unter *Erweiterungen* aktivieren. Die Plugins `utilsplugin2` und `jts` werden benötigt
-und von JOSM automatisch angeboten.
+Einstellungen unter *Erweiterungen* aktivieren. Das Plugin `jts` wird benötigt und von JOSM
+automatisch angeboten.
 
 ## Arbeitsablauf
 
 1. OSM-Daten für das Gebiet herunterladen.
 2. *ALKIS → Ausschnitt analysieren*. Das Plugin lädt ALKIS, vergleicht und prüft das Luftbild.
 3. Im Seitenfenster **ALKIS-Abgleich** Eintrag für Eintrag entscheiden. Die Karte zoomt jeweils
-   mit. Tags lassen sich vor der Übernahme in der Tabelle ändern oder abwählen.
+   formatfüllend auf das Gebäude. Tags lassen sich vor der Übernahme in der Tabelle ändern oder abwählen.
 4. Mit dem JOSM-Validator prüfen und wie gewohnt manuell hochladen.
 
 > **Wichtig:** Werden ALKIS-Daten in größerem Umfang übernommen, gilt das als Import im Sinne der

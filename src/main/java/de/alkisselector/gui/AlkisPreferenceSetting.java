@@ -90,6 +90,8 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
     // Schwellenwerte
     private final Map<AlkisSettings.Setting, JSpinner> thresholdSpinners = new LinkedHashMap<>();
     private final JCheckBox logEnabled = new JCheckBox("Entscheidungsprotokoll (CSV) für die Evaluierung schreiben");
+    private final JCheckBox clipOverlaps = new JCheckBox(
+            "Überlappungen neuer Gebäude mit vorhandenen OSM-Gebäuden abschneiden");
 
     /** Erzeugt den Einstellungsreiter. */
     public AlkisPreferenceSetting() {
@@ -233,7 +235,9 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         threshold(p, "Überdeckung für Zuordnung (0–1):", AlkisSettings.PARTNER_OVERLAP, 0.05, 1, 0.05);
         threshold(p, "Min. IoU für „abweichend“ (0–1):", AlkisSettings.DEVIATING_MIN_IOU, 0, 1, 0.05);
         section(p, "Übernahme und Analyse");
-        threshold(p, "Knoten wiederverwenden bis (m):", AlkisSettings.NODE_SNAP_DISTANCE, 0, 1, 0.01);
+        threshold(p, "An Nachbargebäude anschließen bis (m):", AlkisSettings.FIT_TOLERANCE, 0, 2, 0.1);
+        clipOverlaps.setSelected(AlkisSettings.isClipOverlaps());
+        p.add(clipOverlaps, GBC.eol().insets(10, 2, 0, 2));
         threshold(p, "Suchradius für vorhandene Adressen (m):", AlkisSettings.ADDRESS_SEARCH_RADIUS, 0, 500, 10);
         threshold(p, "Maximale Ausschnittsfläche (km²):", AlkisSettings.MAX_AREA_KM2, 0.01, 25, 0.25);
         logEnabled.setSelected(AlkisSettings.isDecisionLogEnabled());
@@ -341,6 +345,7 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         ProfileStore.getInstance().setProfiles(new ArrayList<>(working), current.getName());
         thresholdSpinners.forEach((s, sp) -> s.put(((Number) sp.getValue()).doubleValue()));
         AlkisSettings.setDecisionLogEnabled(logEnabled.isSelected());
+        AlkisSettings.setClipOverlaps(clipOverlaps.isSelected());
         return false;
     }
 

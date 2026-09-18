@@ -315,21 +315,41 @@ public final class ReviewDialog extends ToggleDialog {
                 }
             }
         }
-        if (b == null && c.getOsmOnly() != null) {
-            BBox bb = c.getOsmOnly().getPrimitive().getBBox();
-            if (bb.isValid()) {
-                b = new Bounds(bb.getBottomRight());
+        // bei „abweichend“/„komplex“ auch die OSM-Gebäude einrahmen, damit beide Umrisse vergleichbar sind
+        List<org.openstreetmap.josm.data.osm.OsmPrimitive> extra = new java.util.ArrayList<>();
+        c.getMatch().getPartners().forEach(p -> extra.add(p.getPrimitive()));
+        if (c.getOsmOnly() != null) {
+            extra.add(c.getOsmOnly().getPrimitive());
+        }
+        for (org.openstreetmap.josm.data.osm.OsmPrimitive p : extra) {
+            BBox bb = p.getBBox();
+            if (p.isUsable() && bb.isValid()) {
+                if (b == null) {
+                    b = new Bounds(bb.getBottomRight());
+                } else {
+                    b.extend(bb.getBottomRight());
+                }
                 b.extend(bb.getTopLeft());
             }
         }
         if (b == null) {
             return;
         }
-        // 25 m Rand, damit die Umgebung sichtbar bleibt
-        double dLat = 25 / 111_000.0;
-        double dLon = dLat / Math.max(0.2, Math.cos(Math.toRadians(b.getCenter().lat())));
-        Bounds z = new Bounds(b.getMinLat() - dLat, b.getMinLon() - dLon, b.getMaxLat() + dLat, b.getMaxLon() + dLon);
-        MainApplication.getMap().mapView.zoomTo(z);
+        MainApplication.getMap().mapView.zoomTo(withMargin(b));
+    }
+
+    /**
+     * Fügt einen kleinen Rand hinzu, sodass das Gebäude den Ausschnitt möglichst füllt:
+     * 15 % der Ausdehnung, mindestens 1,5 m.
+     */
+    private static Bounds withMargin(Bounds b) {
+        double cos = Math.max(0.2, Math.cos(Math.toRadians(b.getCenter().lat())));
+        double heightM = (b.getMaxLat() - b.getMinLat()) * 111_000.0;
+        double widthM = (b.getMaxLon() - b.getMinLon()) * 111_000.0 * cos;
+        double marginM = Math.max(1.5, 0.15 * Math.max(heightM, widthM));
+        double dLat = marginM / 111_000.0;
+        double dLon = dLat / cos;
+        return new Bounds(b.getMinLat() - dLat, b.getMinLon() - dLon, b.getMaxLat() + dLat, b.getMaxLon() + dLon);
     }
 
     // ------------------------------------------------------------------ Entscheidungen
@@ -396,7 +416,7 @@ public final class ReviewDialog extends ToggleDialog {
             return false;
         }
         try {
-            Command cmd = new ApplyAction(session, AlkisSettings.NODE_SNAP_DISTANCE.get()).apply(c);
+            Command cmd = new ApplyAction(session).apply(c);
             if (cmd == null) {
                 return false;
             }

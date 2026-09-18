@@ -2,20 +2,26 @@
 package de.alkisselector.decision;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.locationtech.jts.geom.Envelope;
 import org.openstreetmap.josm.command.AddCommand;
+import org.openstreetmap.josm.command.ChangeNodesCommand;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
 import org.openstreetmap.josm.command.Command;
+import org.openstreetmap.josm.command.DeleteCommand;
+import org.openstreetmap.josm.command.MoveCommand;
 import org.openstreetmap.josm.command.SequenceCommand;
+import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.LatLon;
-import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
@@ -23,14 +29,12 @@ import org.openstreetmap.josm.data.osm.Relation;
 import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
-import org.openstreetmap.josm.plugins.utilsplugin2.replacegeometry.ReplaceGeometryCommand;
-import org.openstreetmap.josm.plugins.utilsplugin2.replacegeometry.ReplaceGeometryException;
-import org.openstreetmap.josm.plugins.utilsplugin2.replacegeometry.ReplaceGeometryUtils;
 
 import de.alkisselector.compare.MatchClass;
 import de.alkisselector.compare.OsmBuilding;
+import de.alkisselector.config.AlkisSettings;
 import de.alkisselector.config.TagProposal;
-import de.alkisselector.source.AlkisBuilding;
+import de.alkisselector.source.CrsTransformer;
 
 /**
  * Überträgt einen Kandidaten in den OSM-Datensatz. Alle Änderungen laufen über das Undo-System
@@ -39,15 +43,12 @@ import de.alkisselector.source.AlkisBuilding;
 public final class ApplyAction {
 
     private final AnalysisSession session;
-    private final double snapDistance;
 
     /**
      * @param session Analyse-Sitzung
-     * @param snapDistance Abstand (m), in dem vorhandene Knoten wiederverwendet werden
      */
-    public ApplyAction(AnalysisSession session, double snapDistance) {
+    public ApplyAction(AnalysisSession session) {
         this.session = session;
-        this.snapDistance = snapDistance;
     }
 
     /**
@@ -94,26 +95,40 @@ public final class ApplyAction {
 
     // ------------------------------------------------------------------ Neuanlage
 
-    private Command applyNew(Candidate c, DataSet ds, Map<String, String> tags) {
-        AlkisBuilding b = c.getBuilding();
+    private Command applyNew(Candidate c, DataSet ds, Map<String, String> tags) throws ApplyException {
+        // Anpassung an Nachbargebäude mit dem aktuellen Datenstand (inkl. zuvor übernommener Gebäude)
+        double tol = AlkisSettings.FIT_TOLERANCE.get();
+        NeighbourFitter.Result fit = new NeighbourFitter(tol, AlkisSettings.isClipOverlaps())
+                .fit(c.getGeometry(), NeighbourWays.collect(ds, session.getCrs(), boundsAround(c, tol + 1)));
+
         List<Command> cmds = new ArrayList<>();
-        NodeFactory nodes = new NodeFactory(ds, cmds, Set.of());
+        FittedNodes nodes = new FittedNodes(ds, cmds, Collections.emptyList());
+        List<List<Way>> polygons = new ArrayList<>();
+        for (List<List<NeighbourFitter.Vertex>> poly : fit.getPolygons()) {
+            List<Way> rings = new ArrayList<>();
+            for (List<NeighbourFitter.Vertex> ring : poly) {
+                if (ring.size() < 3) {
+                    throw new ApplyException("Der angepasste Umriss ist zu klein – bitte manuell zeichnen.");
+                }
+                rings.add(nodes.buildWay(ring));
+            }
+            polygons.add(rings);
+        }
+        if (polygons.isEmpty()) {
+            throw new ApplyException("Nach der Anpassung an die Nachbargebäude bleibt keine Fläche übrig.");
+        }
         OsmPrimitive result;
-        if (b.isSimple()) {
-            Way w = nodes.buildWay(b.getPolygons().get(0).getOuter());
+        if (polygons.size() == 1 && polygons.get(0).size() == 1) {
+            Way w = polygons.get(0).get(0);
             w.setKeys(tags);
             cmds.add(new AddCommand(ds, w));
             result = w;
         } else {
             Relation r = new Relation();
-            for (AlkisBuilding.Polygon p : b.getPolygons()) {
-                Way outer = nodes.buildWay(p.getOuter());
-                cmds.add(new AddCommand(ds, outer));
-                r.addMember(new RelationMember("outer", outer));
-                for (double[] h : p.getHoles()) {
-                    Way inner = nodes.buildWay(h);
-                    cmds.add(new AddCommand(ds, inner));
-                    r.addMember(new RelationMember("inner", inner));
+            for (List<Way> rings : polygons) {
+                for (int i = 0; i < rings.size(); i++) {
+                    cmds.add(new AddCommand(ds, rings.get(i)));
+                    r.addMember(new RelationMember(i == 0 ? "outer" : "inner", rings.get(i)));
                 }
             }
             Map<String, String> rt = new LinkedHashMap<>();
@@ -123,14 +138,146 @@ public final class ApplyAction {
             cmds.add(new AddCommand(ds, r));
             result = r;
         }
+        // neue Knoten in die Kanten der Nachbargebäude einfügen (gemeinsame Punkte)
+        cmds.addAll(nodes.glueCommands());
         Command cmd = new SequenceCommand("ALKIS-Gebäude anlegen: " + c.getTitle(), cmds);
         UndoRedoHandler.getInstance().add(cmd);
         ds.setSelected(result);
         return cmd;
     }
 
+    /** Ein neuer Knoten, der in die Kante {@code segment} eines Nachbarwegs eingefügt wird. */
+    private static final class Glue {
+        final int segment;
+        final double t;
+        final Node node;
+
+        Glue(int segment, double t, Node node) {
+            this.segment = segment;
+            this.t = t;
+            this.node = node;
+        }
+    }
+
+    /**
+     * Setzt die Eckpunkte des {@link NeighbourFitter} in Knoten um: vorhandene Knoten werden
+     * wiederverwendet, Punkte auf Nachbarkanten werden dort als neue Knoten eingefügt. Beim Ersetzen
+     * werden freie Punkte bevorzugt mit verschobenen alten Knoten besetzt (Knotenhistorie bleibt).
+     */
+    private final class FittedNodes {
+        private final DataSet ds;
+        private final List<Command> cmds;
+        private final List<Node> pool;
+        private final List<Node> created = new ArrayList<>();
+        /** je Nachbarweg: eingefügte Knoten mit Kantenindex und Position */
+        private final Map<Way, List<Glue>> glue = new LinkedHashMap<>();
+
+        FittedNodes(DataSet ds, List<Command> cmds, List<Node> pool) {
+            this.ds = ds;
+            this.cmds = cmds;
+            this.pool = new ArrayList<>(pool);
+        }
+
+        Way buildWay(List<NeighbourFitter.Vertex> ring) {
+            Way w = new Way();
+            w.setNodes(ringNodes(ring));
+            return w;
+        }
+
+        /** @return geschlossene Knotenliste für einen Ring */
+        List<Node> ringNodes(List<NeighbourFitter.Vertex> ring) {
+            List<Node> wayNodes = new ArrayList<>();
+            for (NeighbourFitter.Vertex v : ring) {
+                Node n = node(v);
+                if (wayNodes.isEmpty() || wayNodes.get(wayNodes.size() - 1) != n) {
+                    wayNodes.add(n);
+                }
+            }
+            if (wayNodes.size() > 1 && wayNodes.get(wayNodes.size() - 1) == wayNodes.get(0)) {
+                wayNodes.remove(wayNodes.size() - 1);
+            }
+            wayNodes.add(wayNodes.get(0));
+            return wayNodes;
+        }
+
+        /** @return Knoten aus dem Pool, die nicht wiederverwendet wurden */
+        List<Node> unusedPool() {
+            return pool;
+        }
+
+        private Node node(NeighbourFitter.Vertex v) {
+            if (v.getNode() instanceof Node && ((Node) v.getNode()).isUsable()) {
+                return (Node) v.getNode();
+            }
+            LatLon ll = session.getCrs().toLatLon(v.getX(), v.getY());
+            for (Node n : created) {
+                if (n.greatCircleDistance(ll) <= 0.01) {
+                    return n;
+                }
+            }
+            Node n = takeFromPool(ll);
+            if (n == null) {
+                n = new Node(ll);
+                cmds.add(new AddCommand(ds, n));
+            }
+            created.add(n);
+            if (v.getGlueWay() != null && v.getGlueWay().getHandle() instanceof Way) {
+                glue.computeIfAbsent((Way) v.getGlueWay().getHandle(), k -> new ArrayList<>())
+                        .add(new Glue(v.getGlueSegment(), v.getGlueT(), n));
+            }
+            return n;
+        }
+
+        /** Nimmt den nächstgelegenen alten Knoten aus dem Pool und verschiebt ihn an die neue Position. */
+        private Node takeFromPool(LatLon ll) {
+            Node best = null;
+            double bestDist = Double.MAX_VALUE;
+            for (Node n : pool) {
+                double d = n.greatCircleDistance(ll);
+                if (d < bestDist) {
+                    bestDist = d;
+                    best = n;
+                }
+            }
+            if (best != null) {
+                pool.remove(best);
+                if (bestDist > 0.001) {
+                    cmds.add(new MoveCommand(best, ll));
+                }
+            }
+            return best;
+        }
+
+        List<Command> glueCommands() {
+            List<Command> result = new ArrayList<>();
+            for (Map.Entry<Way, List<Glue>> e : glue.entrySet()) {
+                Way w = e.getKey();
+                List<Glue> inserts = e.getValue();
+                inserts.sort(Comparator.comparingInt((Glue g) -> g.segment).thenComparingDouble(g -> g.t));
+                List<Node> old = w.getNodes();
+                List<Node> nodes = new ArrayList<>();
+                for (int i = 0; i < old.size(); i++) {
+                    nodes.add(old.get(i));
+                    for (Glue g : inserts) {
+                        if (g.segment == i && i < old.size() - 1) {
+                            nodes.add(g.node);
+                        }
+                    }
+                }
+                result.add(new ChangeNodesCommand(ds, w, nodes));
+            }
+            return result;
+        }
+    }
+
     // ------------------------------------------------------------------ Geometrie ersetzen
 
+    /**
+     * Ersetzt die Geometrie eines bestehenden Wegs durch die (an Nachbarn angepasste) ALKIS-Geometrie.
+     * Der Weg behält ID, Historie, Tags und Relationen. Knoten, die mit anderen Wegen verbunden sind
+     * oder Tags tragen, bleiben an ihrer Position und werden – sofern nahe genug – in den neuen Umriss
+     * eingebaut. Die übrigen alten Knoten werden verschoben und wiederverwendet, überzählige gelöscht.
+     */
     private Command applyReplace(Candidate c, DataSet ds, Map<String, String> tags) throws ApplyException {
         OsmBuilding partner = c.getMatch().getPartner();
         if (partner == null || !(partner.getPrimitive() instanceof Way)) {
@@ -140,38 +287,45 @@ public final class ApplyAction {
             throw new ApplyException("Das ALKIS-Gebäude hat Innenhöfe oder mehrere Teile – bitte manuell ersetzen.");
         }
         Way old = (Way) partner.getPrimitive();
-        if (old.isDeleted() || !old.isUsable()) {
+        if (old.isDeleted() || !old.isUsable() || !old.isClosed()) {
             throw new ApplyException("Das OSM-Gebäude wurde inzwischen gelöscht oder verändert.");
         }
-        // Die Teilschritte hängen voneinander ab (Schritt 2 braucht den Weg aus Schritt 1) und werden
-        // daher einzeln aufgebaut und ausgeführt; am Ende landen sie als EIN Undo-Schritt im Stapel.
-        List<Command> steps = new ArrayList<>();
-
-        // 1. neuen Weg ohne Tags anlegen (Knoten des alten Wegs nicht wiederverwenden)
-        List<Command> prep = new ArrayList<>();
-        NodeFactory nodes = new NodeFactory(ds, prep, new HashSet<>(old.getNodes()));
-        Way w = nodes.buildWay(c.getBuilding().getPolygons().get(0).getOuter());
-        prep.add(new AddCommand(ds, w));
-        Command prepCmd = new SequenceCommand("ALKIS-Geometrie vorbereiten", prep);
-        prepCmd.executeCommand();
-        steps.add(prepCmd);
-
-        // 2. Geometrie des bestehenden Wegs durch die neue ersetzen (Historie und ID bleiben erhalten)
-        ReplaceGeometryCommand replace;
-        try {
-            replace = ReplaceGeometryUtils.buildReplaceWayCommand(old, w);
-        } catch (ReplaceGeometryException | IllegalArgumentException e) {
-            prepCmd.undoCommand();
-            throw new ApplyException("Geometrie konnte nicht ersetzt werden: " + e.getMessage());
+        CrsTransformer crs = session.getCrs();
+        double tol = AlkisSettings.FIT_TOLERANCE.get();
+        List<NeighbourFitter.NeighbourWay> neighbours = new ArrayList<>();
+        for (NeighbourFitter.NeighbourWay n : NeighbourWays.collect(ds, crs, boundsAround(c, tol + 1))) {
+            if (n.getHandle() != old) {
+                neighbours.add(n);
+            }
         }
-        if (replace == null) {
-            prepCmd.undoCommand();
-            return null;
+        List<NeighbourFitter.KeepNode> keep = NeighbourWays.keepNodes(old, crs);
+        NeighbourFitter.Result fit = new NeighbourFitter(tol, AlkisSettings.isClipOverlaps())
+                .fit(c.getGeometry(), neighbours, keep);
+        if (fit.getPolygons().size() != 1 || fit.getPolygons().get(0).size() != 1
+                || fit.getPolygons().get(0).get(0).size() < 3) {
+            throw new ApplyException("Die angepasste Geometrie besteht aus mehreren Teilen – bitte manuell bearbeiten.");
         }
-        replace.executeCommand();
-        steps.add(replace);
 
-        // 3. Tags nur ergänzen bzw. vom Nutzer ausdrücklich gewählte Werte setzen
+        // alte Knoten, die nur zu diesem Gebäude gehören, werden verschoben und wiederverwendet
+        Set<Node> keepSet = new HashSet<>();
+        keep.forEach(k -> keepSet.add((Node) k.node));
+        List<Node> pool = new ArrayList<>();
+        for (Node n : new LinkedHashSet<>(old.getNodes())) {
+            if (!keepSet.contains(n) && !n.hasKeys() && n.getReferrers().size() == 1) {
+                pool.add(n);
+            }
+        }
+        List<Command> cmds = new ArrayList<>();
+        FittedNodes nodes = new FittedNodes(ds, cmds, pool);
+        List<Node> newNodes = nodes.ringNodes(fit.getPolygons().get(0).get(0));
+        cmds.add(new ChangeNodesCommand(ds, old, newNodes));
+        cmds.addAll(nodes.glueCommands());
+        List<Node> unused = nodes.unusedPool();
+        if (!unused.isEmpty()) {
+            cmds.add(new DeleteCommand(ds, unused));
+        }
+
+        // Tags nur ergänzen bzw. vom Nutzer ausdrücklich gewählte Werte setzen
         Map<String, String> changes = new LinkedHashMap<>();
         tags.forEach((k, v) -> {
             if (!v.equals(old.get(k))) {
@@ -179,19 +333,23 @@ public final class ApplyAction {
             }
         });
         if (!changes.isEmpty()) {
-            Command tagCmd = new ChangePropertyCommand(ds, List.of(old), changes);
-            tagCmd.executeCommand();
-            steps.add(tagCmd);
+            cmds.add(new ChangePropertyCommand(ds, List.of(old), changes));
         }
-        // SequenceCommand macht Undo nur, wenn es selbst ausgeführt wurde. Deshalb die Teilschritte
-        // zurücknehmen und die Sequenz regulär (wie bei „Wiederholen“) ausführen lassen.
-        for (int i = steps.size() - 1; i >= 0; i--) {
-            steps.get(i).undoCommand();
-        }
-        Command all = new SequenceCommand("ALKIS-Geometrie übernehmen: " + c.getTitle(), steps);
+        Command all = new SequenceCommand("ALKIS-Geometrie übernehmen: " + c.getTitle(), cmds);
         UndoRedoHandler.getInstance().add(all);
         ds.setSelected(old);
         return all;
+    }
+
+    private Bounds boundsAround(Candidate c, double margin) {
+        Envelope env = new Envelope(c.getGeometry().getEnvelopeInternal());
+        env.expandBy(margin);
+        CrsTransformer crs = session.getCrs();
+        Bounds bounds = new Bounds(crs.toLatLon(env.getMinX(), env.getMinY()));
+        bounds.extend(crs.toLatLon(env.getMaxX(), env.getMaxY()));
+        bounds.extend(crs.toLatLon(env.getMinX(), env.getMaxY()));
+        bounds.extend(crs.toLatLon(env.getMaxX(), env.getMinY()));
+        return bounds;
     }
 
     private void addSourceTag(DataSet ds) {
@@ -204,80 +362,6 @@ public final class ApplyAction {
             ds.addChangeSetTag("source", src);
         } else if (!existing.contains(src)) {
             ds.addChangeSetTag("source", existing + ";" + src);
-        }
-    }
-
-    /**
-     * Erzeugt Knoten und verwendet dabei vorhandene Knoten in unmittelbarer Nähe wieder, damit
-     * aneinandergrenzende Gebäude gemeinsame Knoten haben.
-     */
-    private final class NodeFactory {
-        private final DataSet ds;
-        private final List<Command> cmds;
-        private final Collection<Node> forbidden;
-        private final List<Node> created = new ArrayList<>();
-
-        NodeFactory(DataSet ds, List<Command> cmds, Collection<Node> forbidden) {
-            this.ds = ds;
-            this.cmds = cmds;
-            this.forbidden = forbidden;
-        }
-
-        Way buildWay(double[] ring) {
-            List<Node> wayNodes = new ArrayList<>();
-            for (int i = 0; i + 3 < ring.length; i += 2) { // letzter Punkt = erster Punkt
-                LatLon ll = session.getCrs().toLatLon(ring[i], ring[i + 1]);
-                Node n = findOrCreate(ll);
-                if (wayNodes.isEmpty() || wayNodes.get(wayNodes.size() - 1) != n) {
-                    wayNodes.add(n);
-                }
-            }
-            if (wayNodes.size() > 1 && wayNodes.get(wayNodes.size() - 1) == wayNodes.get(0)) {
-                wayNodes.remove(wayNodes.size() - 1);
-            }
-            wayNodes.add(wayNodes.get(0));
-            Way w = new Way();
-            w.setNodes(wayNodes);
-            return w;
-        }
-
-        private Node findOrCreate(LatLon ll) {
-            for (Node n : created) {
-                if (n.greatCircleDistance(ll) <= snapDistance) {
-                    return n;
-                }
-            }
-            double d = snapDistance / 111_000.0 * 2;
-            BBox box = new BBox(ll.lon() - d * 2, ll.lat() - d, ll.lon() + d * 2, ll.lat() + d);
-            Node best = null;
-            double bestDist = snapDistance;
-            for (Node n : ds.searchNodes(box)) {
-                if (!n.isUsable() || forbidden.contains(n) || !n.isLatLonKnown()) {
-                    continue;
-                }
-                double dist = n.greatCircleDistance(ll);
-                if (dist <= bestDist && isBuildingNode(n)) {
-                    best = n;
-                    bestDist = dist;
-                }
-            }
-            if (best != null) {
-                return best;
-            }
-            Node n = new Node(ll);
-            cmds.add(new AddCommand(ds, n));
-            created.add(n);
-            return n;
-        }
-
-        private boolean isBuildingNode(Node n) {
-            for (OsmPrimitive ref : n.getReferrers()) {
-                if (ref instanceof Way && (ref.hasKey("building") || ((Way) ref).getReferrers().stream()
-                        .anyMatch(r -> r instanceof Relation && r.hasKey("building")))) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 

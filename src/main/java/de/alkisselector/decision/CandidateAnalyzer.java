@@ -116,6 +116,7 @@ public final class CandidateAnalyzer {
             if (mr.getNote() != null) {
                 c.getHints().add(mr.getNote());
             }
+            fitToNeighbours(c, osm);
             result.add(c);
         }
 
@@ -137,6 +138,51 @@ public final class CandidateAnalyzer {
         }
         result.sort(SPATIAL_ORDER);
         session.getCandidates().addAll(result);
+    }
+
+    /**
+     * Berechnet für neue Gebäude die an vorhandene Nachbargebäude angepasste Geometrie
+     * (Vorschau, Hinweise, Konflikterkennung). Die eigentliche Übernahme rechnet mit dem
+     * aktuellen Datenstand erneut.
+     */
+    private void fitToNeighbours(Candidate c, OsmSnapshot osm) {
+        NeighbourFitter.Result fit;
+        NeighbourFitter fitter = new NeighbourFitter(params.fitTolerance, params.clipOverlaps);
+        if (c.getMatchClass() == MatchClass.NEU) {
+            if (osm.getNeighbourWays().isEmpty()) {
+                return;
+            }
+            fit = fitter.fit(c.getGeometry(), osm.getNeighbourWays());
+        } else if (c.getMatchClass() == MatchClass.ABWEICHEND && c.getMatch().getPartner() != null
+                && c.getBuilding().isSimple()) {
+            // beim Ersetzen: an Nachbarn (ohne das zu ersetzende Gebäude) anpassen und
+            // Verbindungen zu angrenzenden Wegen/Eingängen festhalten
+            Object partner = c.getMatch().getPartner().getPrimitive();
+            List<NeighbourFitter.NeighbourWay> others = new ArrayList<>();
+            for (NeighbourFitter.NeighbourWay n : osm.getNeighbourWays()) {
+                if (n.getHandle() != partner) {
+                    others.add(n);
+                }
+            }
+            fit = fitter.fit(c.getGeometry(), others, osm.getKeepNodes(c.getMatch().getPartner().getPrimitive()));
+        } else {
+            return;
+        }
+        List<List<LatLon>> outlines = new ArrayList<>();
+        if (fit.isModified()) {
+            for (List<List<NeighbourFitter.Vertex>> poly : fit.getPolygons()) {
+                for (List<NeighbourFitter.Vertex> ring : poly) {
+                    List<LatLon> l = new ArrayList<>();
+                    ring.forEach(v -> l.add(crs.toLatLon(v.getX(), v.getY())));
+                    if (!l.isEmpty()) {
+                        l.add(l.get(0));
+                    }
+                    outlines.add(l);
+                }
+            }
+        }
+        c.setFit(fit, outlines);
+        c.getHints().addAll(fit.getHints());
     }
 
     private List<List<LatLon>> outlines(AlkisBuilding b) {
@@ -310,6 +356,9 @@ public final class CandidateAnalyzer {
      * @return Empfehlung
      */
     static Recommendation recommend(Candidate c, double threshold) {
+        if (c.getFit() != null && c.getFit().isConflict()) {
+            return Recommendation.DISKREPANZ;
+        }
         switch (c.getMatchClass()) {
         case IDENTISCH:
             return Recommendation.NICHTS_ZU_TUN;
@@ -358,6 +407,8 @@ public final class CandidateAnalyzer {
         final double orthoMaxOffset;
         final double orthoMaxOverhang;
         final double addressRadius;
+        double fitTolerance = 0.5;
+        boolean clipOverlaps = true;
 
         /**
          * @param matching Schwellen der OSM-Zuordnung
@@ -377,6 +428,17 @@ public final class CandidateAnalyzer {
             this.addressRadius = addressRadius;
         }
 
+        /**
+         * @param tolerance Abstand (m) für den Anschluss an Nachbargebäude
+         * @param clip Überlappungen abschneiden
+         * @return diese Parameter (für Verkettung)
+         */
+        public Params withFit(double tolerance, boolean clip) {
+            this.fitTolerance = tolerance;
+            this.clipOverlaps = clip;
+            return this;
+        }
+
         /** @return Parameter aus den aktuellen Einstellungen */
         public static Params fromSettings() {
             return new Params(
@@ -389,7 +451,8 @@ public final class CandidateAnalyzer {
                     AlkisSettings.ORTHO_TOLERANCE.get(),
                     AlkisSettings.ORTHO_MAX_OFFSET.get(),
                     AlkisSettings.ORTHO_MAX_OVERHANG.get(),
-                    AlkisSettings.ADDRESS_SEARCH_RADIUS.get());
+                    AlkisSettings.ADDRESS_SEARCH_RADIUS.get())
+                    .withFit(AlkisSettings.FIT_TOLERANCE.get(), AlkisSettings.isClipOverlaps());
         }
     }
 }

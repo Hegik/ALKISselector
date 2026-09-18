@@ -129,7 +129,7 @@ class OnlinePipelineTest {
         Candidate neu = session.getCandidates().stream()
                 .filter(c -> c.getMatchClass() == MatchClass.NEU && c.getBuilding().isSimple()).findFirst().orElseThrow();
         int before = ds.getWays().size();
-        Command cmdNew = new ApplyAction(session, 0.05).apply(neu);
+        Command cmdNew = new ApplyAction(session).apply(neu);
         assertNotNull(cmdNew);
         assertEquals(before + 1, ds.getWays().size());
         OsmPrimitive created = ds.getSelected().iterator().next();
@@ -142,7 +142,7 @@ class OnlinePipelineTest {
         EastNorth oldFirst = crs.toProjected(shiftedWay.getNode(0));
         cShifted.getTags().forEach(t -> System.out.println("  Vorschlag " + t + " (OSM: " + t.getExistingValue()
                 + ", gewählt: " + t.isSelected() + ")"));
-        Command cmdReplace = new ApplyAction(session, 0.05).apply(cShifted);
+        Command cmdReplace = new ApplyAction(session).apply(cShifted);
         assertNotNull(cmdReplace);
         assertEquals(cmdReplace, UndoRedoHandler.getInstance().getLastCommand(), "ein Undo-Schritt");
         assertFalse(shiftedWay.isDeleted());

@@ -54,6 +54,8 @@ public final class Candidate {
     private Status status = Status.OFFEN;
     private long shownSince;
     private Command appliedCommand;
+    private NeighbourFitter.Result fit;
+    private List<List<LatLon>> fittedOutlines = Collections.emptyList();
 
     /**
      * Kandidat für ein ALKIS-Gebäude.
@@ -170,6 +172,25 @@ public final class Candidate {
 
     public void setAppliedCommand(Command appliedCommand) {
         this.appliedCommand = appliedCommand;
+    }
+
+    /** @return Ergebnis der Anpassung an Nachbargebäude (bei der Analyse berechnet) oder {@code null} */
+    public NeighbourFitter.Result getFit() {
+        return fit;
+    }
+
+    /**
+     * @param fit Ergebnis der Anpassung
+     * @param outlines angepasste Umrisse in WGS84
+     */
+    public void setFit(NeighbourFitter.Result fit, List<List<LatLon>> outlines) {
+        this.fit = fit;
+        this.fittedOutlines = outlines;
+    }
+
+    /** @return angepasste Umrisse (leer, wenn nicht angepasst) */
+    public List<List<LatLon>> getFittedOutlines() {
+        return fittedOutlines;
     }
 
     /** @return Anzeigename, z. B. {@code Wohngebäude, Hittorfstraße 46 a} */

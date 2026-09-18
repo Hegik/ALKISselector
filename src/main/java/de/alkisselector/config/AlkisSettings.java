@@ -28,13 +28,23 @@ public final class AlkisSettings {
     public static final Setting ORTHO_MAX_OVERHANG = new Setting("ortho.max_overhang", 0.9);
     /** Maximale Fläche (km²) für die Ausschnittsanalyse. */
     public static final Setting MAX_AREA_KM2 = new Setting("analysis.max_area_km2", 1.0);
-    /** Abstand (m), in dem vorhandene Knoten beim Anlegen wiederverwendet werden. */
-    public static final Setting NODE_SNAP_DISTANCE = new Setting("apply.node_snap", 0.05);
+    /** Abstand (m), bis zu dem neue Umrisse an vorhandene Nachbargebäude angeschlossen werden. */
+    public static final Setting FIT_TOLERANCE = new Setting("apply.fit_tolerance", 0.5);
     /** Suchradius (m) für vorhandene Adressobjekte mit gleicher Adresse. */
     public static final Setting ADDRESS_SEARCH_RADIUS = new Setting("apply.address_radius", 50);
 
     private AlkisSettings() {
         // Hilfsklasse
+    }
+
+    /** @return ob Überlappungen mit vorhandenen Nachbargebäuden abgeschnitten werden */
+    public static boolean isClipOverlaps() {
+        return Config.getPref().getBoolean(P + "apply.clip_overlaps", true);
+    }
+
+    /** @param clip Überlappungen abschneiden */
+    public static void setClipOverlaps(boolean clip) {
+        Config.getPref().putBoolean(P + "apply.clip_overlaps", clip);
     }
 
     /** @return ob das Entscheidungsprotokoll (CSV) geschrieben wird */

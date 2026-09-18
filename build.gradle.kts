@@ -19,7 +19,7 @@ repositories {
 }
 
 // ---------------------------------------------------------------------------
-// Benötigte JOSM-Plugins (utilsplugin2, jts) werden nicht über Maven verteilt,
+// Benötigte JOSM-Plugins (jts) werden nicht über Maven verteilt,
 // sondern direkt aus dem JOSM-Plugin-Verzeichnis geladen.
 // ---------------------------------------------------------------------------
 val josmPluginDir = layout.buildDirectory.dir("josm-plugins")
@@ -101,7 +101,9 @@ tasks.jar {
 
 // JOSM benötigt diese Freigaben (sonst stehen sie im Manifest der josm.jar, das bei -cp nicht greift).
 val josmJvmArgs = listOf(
+    "--add-exports=java.base/sun.security.action=ALL-UNNAMED",
     "--add-exports=java.base/sun.security.util=ALL-UNNAMED",
+    "--add-exports=java.desktop/com.sun.imageio.plugins.jpeg=ALL-UNNAMED",
     "--add-exports=java.desktop/com.sun.imageio.spi=ALL-UNNAMED",
     "--add-opens=java.base/java.lang=ALL-UNNAMED",
     "--add-opens=java.base/java.nio=ALL-UNNAMED",
@@ -124,9 +126,6 @@ tasks.test {
     }
     systemProperty("josm.home", layout.buildDirectory.dir("josm-test-home").get().asFile.absolutePath)
     jvmArgs(josmJvmArgs)
-    // Die Selbstprüfung (assert) in algs4.AssignmentProblem aus utilsplugin2 schlägt wegen Rundung fehl;
-    // in JOSM sind Assertions ohnehin aus. Für unseren eigenen Code bleiben sie aktiv.
-    jvmArgs("-da:edu.princeton.cs.algs4...")
 }
 
 // ---------------------------------------------------------------------------

@@ -3,13 +3,16 @@ package de.alkisselector.decision;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openstreetmap.josm.data.Bounds;
 import org.openstreetmap.josm.data.coor.EastNorth;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.data.osm.DataSet;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
+import org.openstreetmap.josm.data.osm.Way;
 
 import de.alkisselector.compare.OsmBuilding;
 import de.alkisselector.compare.OsmMatcher;
@@ -23,10 +26,15 @@ public final class OsmSnapshot {
 
     private final List<OsmBuilding> buildings;
     private final List<AddressEntry> addresses;
+    private final List<NeighbourFitter.NeighbourWay> neighbourWays;
+    private final Map<OsmPrimitive, List<NeighbourFitter.KeepNode>> keepNodes;
 
-    private OsmSnapshot(List<OsmBuilding> buildings, List<AddressEntry> addresses) {
+    private OsmSnapshot(List<OsmBuilding> buildings, List<AddressEntry> addresses,
+            List<NeighbourFitter.NeighbourWay> neighbourWays, Map<OsmPrimitive, List<NeighbourFitter.KeepNode>> keepNodes) {
         this.buildings = buildings;
         this.addresses = addresses;
+        this.neighbourWays = neighbourWays;
+        this.keepNodes = keepNodes;
     }
 
     /**
@@ -54,7 +62,13 @@ public final class OsmSnapshot {
                     a.add(new AddressEntry(p, street, hn, en));
                 }
             }
-            return new OsmSnapshot(b, a);
+            Map<OsmPrimitive, List<NeighbourFitter.KeepNode>> keep = new IdentityHashMap<>();
+            for (OsmBuilding ob : b) {
+                if (ob.getPrimitive() instanceof Way) {
+                    keep.put(ob.getPrimitive(), NeighbourWays.keepNodes((Way) ob.getPrimitive(), crs));
+                }
+            }
+            return new OsmSnapshot(b, a, NeighbourWays.collect(ds, crs, bounds), keep);
         } finally {
             ds.getReadLock().unlock();
         }
@@ -62,7 +76,8 @@ public final class OsmSnapshot {
 
     /** @return leere Momentaufnahme (für Tests) */
     public static OsmSnapshot empty() {
-        return new OsmSnapshot(Collections.emptyList(), Collections.emptyList());
+        return new OsmSnapshot(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
+                Collections.emptyMap());
     }
 
     /**
@@ -71,7 +86,20 @@ public final class OsmSnapshot {
      * @return Momentaufnahme aus vorgegebenen Daten (für Tests)
      */
     public static OsmSnapshot of(List<OsmBuilding> buildings, List<AddressEntry> addresses) {
-        return new OsmSnapshot(buildings, addresses);
+        return new OsmSnapshot(buildings, addresses, Collections.emptyList(), Collections.emptyMap());
+    }
+
+    /**
+     * @param building OSM-Gebäude
+     * @return Knoten des Gebäudes, die mit anderen Wegen verbunden sind oder Tags tragen
+     */
+    public List<NeighbourFitter.KeepNode> getKeepNodes(OsmPrimitive building) {
+        return keepNodes.getOrDefault(building, Collections.emptyList());
+    }
+
+    /** @return geschlossene Gebäudeumrisse mit Knoten (für die Anpassung an Nachbargebäude) */
+    public List<NeighbourFitter.NeighbourWay> getNeighbourWays() {
+        return neighbourWays;
     }
 
     public List<OsmBuilding> getBuildings() {

@@ -4,6 +4,7 @@ package de.alkisselector.source;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,7 @@ import java.util.Map;
 import org.openstreetmap.josm.gui.progress.NullProgressMonitor;
 import org.openstreetmap.josm.gui.progress.ProgressMonitor;
 import org.openstreetmap.josm.tools.HttpClient;
+import org.openstreetmap.josm.tools.Logging;
 
 import de.alkisselector.config.ServiceProfile;
 
@@ -108,7 +110,23 @@ public final class WfsClient {
         return appendQuery(profile.getWfsUrl(), q);
     }
 
+    /** Anzahl der Wiederholungen bei Zeitüberschreitung (Dienste bremsen nach vielen Abrufen kurz aus). */
+    private static final int RETRIES = 2;
+
     private List<AlkisBuilding> request(String url, ProgressMonitor pm) throws IOException {
+        for (int attempt = 0; ; attempt++) {
+            try {
+                return requestOnce(url, pm);
+            } catch (SocketTimeoutException e) {
+                if (attempt >= RETRIES || pm.isCanceled()) {
+                    throw new WfsException("Der WFS antwortet nicht (Zeitüberschreitung, " + (attempt + 1) + " Versuche)", e);
+                }
+                Logging.info("ALKISselector: WFS-Zeitüberschreitung, neuer Versuch " + (attempt + 2));
+            }
+        }
+    }
+
+    private List<AlkisBuilding> requestOnce(String url, ProgressMonitor pm) throws IOException {
         HttpClient.Response resp = HttpClient.create(toUrl(url)).connect(pm.createSubTaskMonitor(0, false));
         try {
             if (resp.getResponseCode() != 200) {
