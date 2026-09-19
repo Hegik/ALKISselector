@@ -22,6 +22,7 @@ einen Dienst oder ein Land gebunden.
 | **Anpassung an Nachbarn** | Neue Gebäude schließen ohne Überlappung und ohne Spalt an vorhandene OSM-Gebäude an (gemeinsame Knoten, Überstand wird abgeschnitten) |
 | **Neuanlage mit Attributen** | `building=*` aus der Gebäudefunktion, Adresse aus der Lagebezeichnung, Name, Geschosse; im Dialog editierbar |
 | **Geometrie ersetzen** | Bei abweichenden Gebäuden bleiben ID, Historie und Tags erhalten, Tags werden nur ergänzt. Verbindungen zu angrenzenden Gebäuden, Wegen und Eingängen bleiben erhalten |
+| **ALKIS-Karte** | ALKIS-WMS als Ebene zum visuellen Abgleich: 50 % Deckkraft, liegt automatisch immer über dem Luftbild |
 | **Flurstücke** | Nur als Hintergrundebene, werden nie übernommen |
 | **Profile** | Beliebige WFS/WMS-Dienste. Mitgeliefert: NRW, Beispiel Sachsen in `docs/` |
 | **Evaluierung** | Jede Entscheidung landet als CSV-Zeile im Entscheidungsprotokoll |

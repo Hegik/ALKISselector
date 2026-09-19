@@ -89,44 +89,99 @@ public final class AlkisActions {
         }
     }
 
-    /** Fügt den Orthophoto- oder Flurstücks-WMS des aktiven Profils als Hintergrundebene hinzu. */
+    /** Art der WMS-Ebene, die hinzugefügt wird. */
+    public enum WmsKind {
+        /** Luftbild. */
+        ORTHO("Orthophoto als Ebene anzeigen", "download", "Luftbild des aktiven Profils als Hintergrund anzeigen",
+                "alkisselector:ortho", "Orthophoto"),
+        /** ALKIS-Karte zum visuellen Abgleich (50 % Deckkraft, immer über dem Luftbild). */
+        ALKIS_MAP("ALKIS-Karte als Ebene anzeigen", "alkisselector",
+                "ALKIS-Karte (WMS) des aktiven Profils mit 50 % Deckkraft über dem Luftbild anzeigen",
+                "alkisselector:alkismap", "ALKIS-Karte"),
+        /** Flurstücksgrenzen (nur Anzeige). */
+        PARCELS("Flurstücke als Ebene anzeigen", "dialogs/edit",
+                "Flurstücksgrenzen des aktiven Profils als Hintergrund anzeigen (werden nicht übernommen)",
+                "alkisselector:parcels", "Flurstücke");
+
+        final String name;
+        final String icon;
+        final String tooltip;
+        final String shortcutId;
+        final String label;
+
+        WmsKind(String name, String icon, String tooltip, String shortcutId, String label) {
+            this.name = name;
+            this.icon = icon;
+            this.tooltip = tooltip;
+            this.shortcutId = shortcutId;
+            this.label = label;
+        }
+    }
+
+    /** Hält die ALKIS-Karte über den Luftbildern. */
+    private static WmsLayerOrder layerOrder;
+
+    private static synchronized WmsLayerOrder layerOrder() {
+        if (layerOrder == null) {
+            layerOrder = new WmsLayerOrder(MainApplication.getLayerManager());
+        }
+        return layerOrder;
+    }
+
+    /** Fügt einen WMS des aktiven Profils (Orthophoto, ALKIS-Karte, Flurstücke) als Ebene hinzu. */
     public static final class AddWmsLayerAction extends JosmAction {
-        private final boolean parcels;
+        private final WmsKind kind;
 
         /**
-         * @param parcels {@code true} = Flurstücke, {@code false} = Orthophoto
+         * @param kind Art der Ebene
          */
-        public AddWmsLayerAction(boolean parcels) {
-            super(parcels ? "Flurstücke als Ebene anzeigen" : "Orthophoto als Ebene anzeigen",
-                    parcels ? "dialogs/edit" : "download",
-                    parcels ? "Flurstücksgrenzen des aktiven Profils als Hintergrund anzeigen (werden nicht übernommen)"
-                            : "Luftbild des aktiven Profils als Hintergrund anzeigen",
-                    Shortcut.registerShortcut(parcels ? "alkisselector:parcels" : "alkisselector:ortho",
-                            parcels ? "ALKIS: Flurstücke anzeigen" : "ALKIS: Orthophoto anzeigen",
-                            KeyEvent.CHAR_UNDEFINED, Shortcut.NONE),
-                    false, parcels ? "alkisselector/parcels" : "alkisselector/ortho", false);
-            this.parcels = parcels;
+        public AddWmsLayerAction(WmsKind kind) {
+            super(kind.name, kind.icon, kind.tooltip,
+                    Shortcut.registerShortcut(kind.shortcutId, "ALKIS: " + kind.name, KeyEvent.CHAR_UNDEFINED, Shortcut.NONE),
+                    false, kind.shortcutId.replace(':', '/'), false);
+            this.kind = kind;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             ServiceProfile p = ProfileStore.getInstance().getActiveProfile();
-            String url = parcels ? p.getParcelWmsUrl() : p.getOrthoWmsUrl();
-            String layers = parcels ? p.getParcelLayers() : p.getOrthoLayers();
+            String url;
+            String layers;
+            switch (kind) {
+            case PARCELS:
+                url = p.getParcelWmsUrl();
+                layers = p.getParcelLayers();
+                break;
+            case ALKIS_MAP:
+                url = p.getAlkisMapUrl();
+                layers = p.getAlkisMapLayers();
+                break;
+            default:
+                url = p.getOrthoWmsUrl();
+                layers = p.getOrthoLayers();
+                break;
+            }
             if (url.isBlank() || layers.isBlank()) {
                 JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
-                        "Im Profil „" + p.getName() + "“ ist kein " + (parcels ? "Flurstücks" : "Orthophoto") + "-WMS eingetragen.",
+                        "Im Profil „" + p.getName() + "“ ist kein WMS für „" + kind.label + "“ eingetragen "
+                                + "(Einstellungen → ALKISselector → Dienstprofile).",
                         "ALKISselector", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            String template = OrthoFetcher.josmWmsTemplate(url, layers, parcels ? "image/png" : p.getOrthoFormat(), parcels);
-            ImageryInfo info = new ImageryInfo((parcels ? "Flurstücke – " : "Orthophoto – ") + p.getName(), template,
-                    "wms", null, null);
+            boolean transparent = kind != WmsKind.ORTHO;
+            String template = OrthoFetcher.josmWmsTemplate(url, layers, transparent ? "image/png" : p.getOrthoFormat(),
+                    transparent);
+            ImageryInfo info = new ImageryInfo(kind.label + " – " + p.getName(), template, "wms", null, null);
             info.setServerProjections(Arrays.asList("EPSG:3857", "EPSG:4326", p.getCrs()));
             if (!p.getSourceTag().isBlank()) {
                 info.setAttributionText(p.getSourceTag());
             }
-            MainApplication.getLayerManager().addLayer(ImageryLayer.create(info));
+            ImageryLayer layer = ImageryLayer.create(info);
+            if (kind == WmsKind.ALKIS_MAP) {
+                layerOrder().addAlkisMap(layer);
+            } else {
+                MainApplication.getLayerManager().addLayer(layer);
+            }
         }
 
         @Override

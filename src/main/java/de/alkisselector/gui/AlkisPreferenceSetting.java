@@ -79,6 +79,8 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
     private final JSpinner orthoResolution = new JSpinner(new SpinnerNumberModel(0.1, 0.02, 2.0, 0.05));
     private final JTextField parcelUrl = new JTextField(25);
     private final JTextField parcelLayers = new JTextField(20);
+    private final JTextField alkisMapUrl = new JTextField(25);
+    private final JTextField alkisMapLayers = new JTextField(20);
 
     // Attribute & Tags
     private final RuleTableModel ruleModel = new RuleTableModel();
@@ -174,6 +176,10 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         section(p, "Flurstücke (WMS, nur Anzeige – werden nie übernommen)");
         row(p, "URL:", parcelUrl);
         row(p, "Layer:", parcelLayers);
+
+        section(p, "ALKIS-Karte (WMS, zum Abgleich – 50 % Deckkraft, immer über dem Luftbild)");
+        row(p, "URL:", alkisMapUrl);
+        row(p, "Layer:", alkisMapLayers);
         p.add(new JPanel(), GBC.eol().fill(GBC.BOTH));
         return p;
     }
@@ -279,6 +285,8 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         orthoResolution.setValue(p.getOrthoResolution());
         parcelUrl.setText(p.getParcelWmsUrl());
         parcelLayers.setText(p.getParcelLayers());
+        alkisMapUrl.setText(p.getAlkisMapUrl());
+        alkisMapLayers.setText(p.getAlkisMapLayers());
         ruleModel.setRules(p.getAttributeRules());
         filterModel.setFilters(p.getExcludeFilters());
         lookupAttributes.setText(String.join(", ", p.getTagMapping().getLookupAttributes()));
@@ -308,6 +316,8 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         p.setOrthoResolution(((Number) orthoResolution.getValue()).doubleValue());
         p.setParcelWmsUrl(parcelUrl.getText().strip());
         p.setParcelLayers(parcelLayers.getText().strip());
+        p.setAlkisMapUrl(alkisMapUrl.getText().strip());
+        p.setAlkisMapLayers(alkisMapLayers.getText().strip());
         p.getAttributeRules().clear();
         p.getAttributeRules().addAll(ruleModel.rules);
         p.getExcludeFilters().clear();

@@ -45,8 +45,9 @@ public class AlkisSelectorPlugin extends Plugin {
         MainMenu.add(menu, AlkisActions.TOGGLE_VIEW);
         MainMenu.add(menu, new AlkisActions.ClearAction());
         menu.addSeparator();
-        MainMenu.add(menu, new AlkisActions.AddWmsLayerAction(false));
-        MainMenu.add(menu, new AlkisActions.AddWmsLayerAction(true));
+        MainMenu.add(menu, new AlkisActions.AddWmsLayerAction(AlkisActions.WmsKind.ORTHO));
+        MainMenu.add(menu, new AlkisActions.AddWmsLayerAction(AlkisActions.WmsKind.ALKIS_MAP));
+        MainMenu.add(menu, new AlkisActions.AddWmsLayerAction(AlkisActions.WmsKind.PARCELS));
         menu.addSeparator();
         JMenu profiles = new JMenu("Aktives Profil");
         menu.add(profiles);

@@ -49,6 +49,10 @@ public final class ServiceProfile {
     private String parcelWmsUrl = "";
     private String parcelLayers = "";
 
+    // --- ALKIS-Karte (WMS, zum visuellen Abgleich über dem Orthophoto) ---
+    private String alkisMapUrl = "";
+    private String alkisMapLayers = "";
+
     /** Leeres Profil. */
     public ServiceProfile() {
         // leer
@@ -79,6 +83,8 @@ public final class ServiceProfile {
         orthoResolution = o.orthoResolution;
         parcelWmsUrl = o.parcelWmsUrl;
         parcelLayers = o.parcelLayers;
+        alkisMapUrl = o.alkisMapUrl;
+        alkisMapLayers = o.alkisMapLayers;
     }
 
     // ------------------------------------------------------------------ Getter / Setter
@@ -237,6 +243,22 @@ public final class ServiceProfile {
         this.parcelLayers = parcelLayers;
     }
 
+    public String getAlkisMapUrl() {
+        return alkisMapUrl;
+    }
+
+    public void setAlkisMapUrl(String alkisMapUrl) {
+        this.alkisMapUrl = alkisMapUrl;
+    }
+
+    public String getAlkisMapLayers() {
+        return alkisMapLayers;
+    }
+
+    public void setAlkisMapLayers(String alkisMapLayers) {
+        this.alkisMapLayers = alkisMapLayers;
+    }
+
     /** @return ob ein Orthophoto-Dienst konfiguriert ist */
     public boolean hasOrtho() {
         return !orthoWmsUrl.isBlank() && !orthoLayers.isBlank();
@@ -284,6 +306,9 @@ public final class ServiceProfile {
                 .add("parcels", Json.createObjectBuilder()
                         .add("url", parcelWmsUrl)
                         .add("layers", parcelLayers))
+                .add("alkisMap", Json.createObjectBuilder()
+                        .add("url", alkisMapUrl)
+                        .add("layers", alkisMapLayers))
                 .build();
     }
 
@@ -324,6 +349,9 @@ public final class ServiceProfile {
         JsonObject parcels = obj(o, "parcels");
         p.parcelWmsUrl = parcels.getString("url", "");
         p.parcelLayers = parcels.getString("layers", "");
+        JsonObject alkisMap = obj(o, "alkisMap");
+        p.alkisMapUrl = alkisMap.getString("url", "");
+        p.alkisMapLayers = alkisMap.getString("layers", "");
         if (!o.containsKey("tagMapping") && !o.containsKey("attributeRules") && !o.containsKey("excludeFilters")) {
             // Kompakte Profildatei ohne eigene Übersetzung: Standard für „ALKIS vereinfacht“ verwenden
             DefaultProfiles.addStandardAlkisSettings(p);

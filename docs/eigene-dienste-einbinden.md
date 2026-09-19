@@ -50,6 +50,20 @@ Der WMS muss das Koordinatensystem des Profils unterstützen. Das Bild wird dari
 damit Pixel und Meter linear zusammenhängen. Ohne Orthophoto-Dienst ist die Empfehlung immer
 „ungeprüft“. Übernehmen lässt sich trotzdem, mit Umschalt+Enter.
 
+### ALKIS-Karte (WMS, optional)
+
+Die amtliche ALKIS-Darstellung zum visuellen Abgleich mit dem Luftbild (*ALKIS → ALKIS-Karte als
+Ebene anzeigen*). Die Ebene wird mit **50 % Deckkraft** angelegt, die Deckkraft lässt sich in der
+Ebenenliste ändern. Sie liegt **immer über dem Luftbild**: Wird danach ein Luftbild geladen oder
+werden die Ebenen umsortiert, rückt sie automatisch wieder direkt über das oberste Luftbild.
+
+| Feld | NRW |
+|---|---|
+| URL | `https://www.wms.nrw.de/geobasis/wms_nw_alkis` |
+| Layer | `adv_alkis_flurstuecke,adv_alkis_gebaeude,adv_alkis_bauw_einricht` |
+
+Der Dienst sollte transparentes PNG liefern, damit das Luftbild durchscheint.
+
 ### Flurstücke (WMS, optional)
 
 Werden nur als Hintergrundebene angezeigt (*ALKIS → Flurstücke als Ebene anzeigen*) und **nie**

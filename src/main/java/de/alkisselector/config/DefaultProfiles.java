@@ -33,7 +33,7 @@ public final class DefaultProfiles {
     public static ServiceProfile nrw() {
         ServiceProfile p = new ServiceProfile();
         p.setName("NRW (Geobasis NRW)");
-        p.setDescription("ALKIS vereinfacht (WFS), DOP (WMS) und ALKIS-Flurstücke (WMS) von Geobasis NRW. "
+        p.setDescription("ALKIS vereinfacht (WFS), DOP (WMS) sowie ALKIS-Karte und -Flurstücke (WMS) von Geobasis NRW. "
                 + "Lizenz: Datenlizenz Deutschland – Zero – Version 2.0 (dl-de/zero-2-0).");
         p.setSourceTag("Land NRW (dl-de/zero-2-0): ALKIS, DOP");
         p.setWfsUrl("https://www.wfs.nrw.de/geobasis/wfs_nw_alkis_vereinfacht");
@@ -50,6 +50,8 @@ public final class DefaultProfiles {
         p.setOrthoResolution(0.1);
         p.setParcelWmsUrl("https://www.wms.nrw.de/geobasis/wms_nw_alkis");
         p.setParcelLayers("adv_alkis_flurstuecke");
+        p.setAlkisMapUrl("https://www.wms.nrw.de/geobasis/wms_nw_alkis");
+        p.setAlkisMapLayers("adv_alkis_flurstuecke,adv_alkis_gebaeude,adv_alkis_bauw_einricht");
         return p;
     }
 
