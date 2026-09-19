@@ -7,6 +7,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -286,6 +287,7 @@ public final class ReviewDialog extends ToggleDialog {
         if (c.getStatus() != Candidate.Status.OFFEN) {
             sb.append(" · Status: <b>").append(c.getStatus()).append("</b>");
         }
+        appendOrder(sb, c);
         if (!c.getAllHints().isEmpty()) {
             sb.append("<ul style='margin-left:12px'>");
             c.getAllHints().forEach(h -> sb.append("<li>").append(esc(h)).append("</li>"));
@@ -301,6 +303,46 @@ public final class ReviewDialog extends ToggleDialog {
         boolean editable = c.getStatus() == Candidate.Status.OFFEN && c.getRecommendation().isApplicable();
         tagModel.setTags(c.getTags(), editable);
         setActionsEnabled(c);
+    }
+
+    /** Abhängigkeiten der geführten Reihenfolge und gemeinsam angeglichene Nachbarn. */
+    private void appendOrder(StringBuilder sb, Candidate c) {
+        List<Candidate> open = c.getOpenPrerequisites();
+        if (!open.isEmpty()) {
+            sb.append("<br><font color='#c06000'><b>Vorbedingung:</b> zuerst ").append(titles(open))
+                    .append(" an ALKIS angleichen</font>");
+        }
+        List<Candidate> waiting = new ArrayList<>();
+        for (Candidate d : c.getDependents()) {
+            if (d.getStatus() == Candidate.Status.OFFEN || d.getStatus() == Candidate.Status.UEBERSPRUNGEN) {
+                waiting.add(d);
+            }
+        }
+        if (!waiting.isEmpty()) {
+            sb.append("<br><b>Vorbedingung für</b> ").append(titles(waiting));
+        }
+        if (c.getStatus() == Candidate.Status.OFFEN || c.getStatus() == Candidate.Status.UEBERSPRUNGEN) {
+            List<Candidate> group = ApplyAction.alignmentGroup(c, session);
+            if (group.size() > 1) {
+                sb.append("<br><b>Wird gemeinsam angeglichen mit</b> ").append(titles(group.subList(1, group.size())))
+                        .append(" (gemeinsame Ecken, damit keine Winkel verzerrt werden)");
+            }
+        }
+    }
+
+    private static String titles(List<Candidate> cs) {
+        StringBuilder sb = new StringBuilder();
+        int shown = cs.size() > 4 ? 3 : cs.size();
+        for (int i = 0; i < shown; i++) {
+            if (i > 0) {
+                sb.append(i == shown - 1 && shown == cs.size() ? " und " : ", ");
+            }
+            sb.append("„").append(esc(cs.get(i).getTitle())).append("“");
+        }
+        if (shown < cs.size()) {
+            sb.append(" und ").append(cs.size() - shown).append(" weiteren");
+        }
+        return sb.toString();
     }
 
     private void setActionsEnabled(Candidate c) {
@@ -343,6 +385,19 @@ public final class ReviewDialog extends ToggleDialog {
                     b.extend(bb.getBottomRight());
                 }
                 b.extend(bb.getTopLeft());
+            }
+        }
+        // beim gemeinsamen Angleichen die ganze Gruppe zeigen
+        de.alkisselector.decision.ChangePreview preview = AlkisController.getInstance().getPreview(c);
+        if (preview != null && preview.getGroupSize() > 1) {
+            for (List<LatLon> ring : preview.getNewOutlines()) {
+                for (LatLon ll : ring) {
+                    if (b == null) {
+                        b = new Bounds(ll);
+                    } else {
+                        b.extend(ll);
+                    }
+                }
             }
         }
         if (b == null) {
@@ -428,14 +483,33 @@ public final class ReviewDialog extends ToggleDialog {
             notify("Die Datenebene dieser Analyse ist nicht mehr geöffnet.");
             return false;
         }
+        List<Candidate> prerequisites = c.getOpenPrerequisites();
+        if (!prerequisites.isEmpty()) {
+            // geführte Reihenfolge: zuerst den abweichenden Nachbarn an ALKIS angleichen
+            Candidate p = prerequisites.get(0);
+            if (listModel.indexOf(p) < 0) {
+                filter.setSelectedItem(CandidateTableModel.Filter.ALLE);
+            }
+            if (p.getStatus() == Candidate.Status.UEBERSPRUNGEN) {
+                p.setStatus(Candidate.Status.OFFEN);
+            }
+            select(p, true);
+            notify("Zuerst das angrenzende Gebäude „" + p.getTitle() + "“ an ALKIS angleichen (Enter) oder verwerfen (Entf)."
+                    + " Danach wird „" + c.getTitle() + "“ exakt an die amtliche Lage angebaut.");
+            return false;
+        }
         try {
-            Command cmd = new ApplyAction(session).apply(c);
+            ApplyAction action = new ApplyAction(session);
+            Command cmd = action.apply(c);
             if (cmd == null) {
                 return false;
             }
-            c.setAppliedCommand(cmd);
-            c.setStatus(Candidate.Status.UEBERNOMMEN);
-            DecisionLog.log(session, c, Candidate.Status.UEBERNOMMEN);
+            // mit angeglichene Nachbargebäude sind damit ebenfalls erledigt
+            for (Candidate m : action.getAppliedGroup()) {
+                m.setAppliedCommand(cmd);
+                m.setStatus(Candidate.Status.UEBERNOMMEN);
+                DecisionLog.log(session, m, Candidate.Status.UEBERNOMMEN);
+            }
             return true;
         } catch (ApplyAction.ApplyException e) {
             notify(e.getMessage());
@@ -451,6 +525,14 @@ public final class ReviewDialog extends ToggleDialog {
             } else {
                 notify("Seit der Übernahme wurden weitere Änderungen gemacht – bitte über Bearbeiten → Rückgängig zurücknehmen.");
                 return;
+            }
+            // gemeinsam angeglichene Gebäude werden mit zurückgesetzt
+            for (Candidate m : session.getCandidates()) {
+                if (m != c && m.getAppliedCommand() == applied) {
+                    m.setAppliedCommand(null);
+                    m.setStatus(Candidate.Status.OFFEN);
+                    DecisionLog.log(session, m, Candidate.Status.OFFEN);
+                }
             }
             c.setAppliedCommand(null);
         }

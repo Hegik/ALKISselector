@@ -184,6 +184,7 @@ public final class NeighbourFitter {
         for (NeighbourWay n : near) {
             if (GeometryComparator.intersectionArea(alkis, n.polygon) > MIN_OVERLAP_AREA) {
                 overlapping.add(n.polygon);
+                r.touched.add(n.handle);
             }
         }
         if (overlapping.isEmpty()) {
@@ -239,6 +240,13 @@ public final class NeighbourFitter {
         ring = densify(ring, near);
         ring = attachNeighbourNodes(ring, near);
         ring = dedupe(ring);
+        for (Vertex v : ring) {
+            for (NeighbourWay n : near) {
+                if (v.glueWay == n || (v.node != null && n.nodes.contains(v.node))) {
+                    r.touched.add(n.handle);
+                }
+            }
+        }
         for (Vertex v : ring) {
             if (v.node != null || v.glueWay != null) {
                 r.sharedPoints++;
@@ -734,6 +742,13 @@ public final class NeighbourFitter {
         double remainingOverlap;
         int sharedPoints;
         int keptConnections;
+        /** Nachbarwege (Handles), an die angeschlossen oder an denen abgeschnitten wurde */
+        final java.util.Set<Object> touched = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+
+        /** @return Nachbarwege (Handles), die die Anpassung berührt hat */
+        public java.util.Set<Object> getTouched() {
+            return touched;
+        }
         final List<String> lostConnections = new ArrayList<>();
         boolean conflict;
         final List<String> hints = new ArrayList<>();

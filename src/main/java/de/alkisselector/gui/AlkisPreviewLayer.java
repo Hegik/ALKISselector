@@ -53,6 +53,7 @@ public class AlkisPreviewLayer extends Layer {
 
     static {
         COLORS.put(Recommendation.UEBERNAHME_EMPFOHLEN, new Color(0x00, 0xb0, 0x3c));
+        COLORS.put(Recommendation.ANGLEICHEN, new Color(0x00, 0xa8, 0xc8));
         COLORS.put(Recommendation.DISKREPANZ, new Color(0xff, 0x8c, 0x00));
         COLORS.put(Recommendation.UNGEPRUEFT, new Color(0xf0, 0xd0, 0x00));
         COLORS.put(Recommendation.MANUELL, new Color(0xc0, 0x40, 0xe0));

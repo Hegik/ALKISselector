@@ -7,6 +7,11 @@ package de.alkisselector.decision;
 public enum Recommendation {
     /** Luftbild bestätigt die ALKIS-Geometrie – Übernahme empfohlen (Enter). */
     UEBERNAHME_EMPFOHLEN("Übernahme empfohlen"),
+    /**
+     * OSM-Gebäude stimmt fast mit ALKIS überein, muss aber exakt angeglichen werden, bevor ein
+     * angrenzendes neues Objekt angebaut wird (Enter).
+     */
+    ANGLEICHEN("An ALKIS angleichen"),
     /** Luftbild bestätigt die ALKIS-Geometrie nicht – keine Standardaktion, Übernahme nur mit Umschalt+Enter. */
     DISKREPANZ("Diskrepanz zum Luftbild"),
     /** Kein Luftbildabgleich möglich (kein Dienst oder Fehler) – keine Standardaktion. */
@@ -31,12 +36,12 @@ public enum Recommendation {
 
     /** @return ob der Nutzer die ALKIS-Geometrie übernehmen kann */
     public boolean isApplicable() {
-        return this == UEBERNAHME_EMPFOHLEN || this == DISKREPANZ || this == UNGEPRUEFT;
+        return this == UEBERNAHME_EMPFOHLEN || this == ANGLEICHEN || this == DISKREPANZ || this == UNGEPRUEFT;
     }
 
     /** @return ob die Übernahme ohne zusätzliche Bestätigung (Enter) möglich ist */
     public boolean isDefaultAccept() {
-        return this == UEBERNAHME_EMPFOHLEN;
+        return this == UEBERNAHME_EMPFOHLEN || this == ANGLEICHEN;
     }
 
     @Override

@@ -4,7 +4,9 @@ package de.alkisselector.decision;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.openstreetmap.josm.data.coor.LatLon;
@@ -30,6 +32,7 @@ public final class ChangePreview {
     private final List<LatLon[]> moves = new ArrayList<>();
     private final List<LatLon> created = new ArrayList<>();
     private final List<LatLon> deleted = new ArrayList<>();
+    private int groupSize = 1;
 
     private ChangePreview() {
         // über of(...)
@@ -38,13 +41,24 @@ public final class ChangePreview {
     /**
      * Berechnet die Vorschau für einen Kandidaten.
      * @param c Kandidat
-     * @param crs Arbeits-CRS
+     * @param session Sitzung
      * @return Vorschau (leer für Einträge ohne ALKIS-Geometrie)
      */
-    public static ChangePreview of(Candidate c, CrsTransformer crs) {
+    public static ChangePreview of(Candidate c, AnalysisSession session) {
         ChangePreview p = new ChangePreview();
+        CrsTransformer crs = session.getCrs();
         if (c.getBuilding() == null) {
             return p;
+        }
+        if (c.isReplacement() && ApplyAction.replaceable(c)
+                && ApplyAction.alignmentGroup(c, session).size() > 1) {
+            // gewähltes Gebäude und alle mit anzugleichenden Nachbarn: Probeausführung wie bei der Übernahme
+            try {
+                p.simulateGroup(c, session);
+                return p;
+            } catch (ApplyAction.ApplyException e) {
+                p = new ChangePreview(); // Einzelvorschau, die Übernahme meldet den Fehler
+            }
         }
         List<List<NeighbourFitter.Vertex>> rings = new ArrayList<>();
         if (c.getFit() != null && !c.getFit().getPolygons().isEmpty()) {
@@ -63,7 +77,7 @@ public final class ChangePreview {
         }
 
         OsmBuilding partner = c.getMatch().getPartner();
-        if (c.getMatchClass() == MatchClass.ABWEICHEND && partner != null && partner.getPrimitive() instanceof Way
+        if (c.isReplacement() && partner != null && partner.getPrimitive() instanceof Way
                 && partner.getPrimitive().isUsable() && rings.size() == 1) {
             p.previewReplace((Way) partner.getPrimitive(), rings.get(0), crs);
         } else if (c.getMatchClass() == MatchClass.NEU) {
@@ -141,6 +155,54 @@ public final class ChangePreview {
         for (int i = 0; i + 3 < ring.length; i += 2) { // letzter = erster Punkt
             out.add(new double[] {ring[i], ring[i + 1]});
         }
+    }
+
+    /**
+     * Vorschau aus einer Probeausführung: vorher/nachher der Gruppenmitglieder vergleichen.
+     */
+    private void simulateGroup(Candidate c, AnalysisSession session) throws ApplyAction.ApplyException {
+        Map<Node, LatLon> before = new LinkedHashMap<>();
+        List<Way> ways = new ArrayList<>();
+        for (Candidate m : ApplyAction.alignmentGroup(c, session)) {
+            Way w = (Way) m.getMatch().getPartner().getPrimitive();
+            ways.add(w);
+            oldOutlines.add(coords(w.getNodes()));
+            w.getNodes().forEach(n -> before.put(n, n.getCoor()));
+        }
+        new ApplyAction(session).simulateReplace(c, group -> {
+            java.util.Set<Node> seen = new java.util.HashSet<>();
+            for (Way w : ways) {
+                newOutlines.add(coords(w.getNodes()));
+                for (Node n : w.getNodes()) {
+                    if (!seen.add(n)) {
+                        continue;
+                    }
+                    LatLon old = before.get(n);
+                    if (old == null) {
+                        created.add(n.getCoor());
+                    } else if (old.greatCircleDistance(n.getCoor()) > 0.001) {
+                        moves.add(new LatLon[] {old, n.getCoor()});
+                    }
+                }
+            }
+            before.forEach((n, ll) -> {
+                if (n.isDeleted()) {
+                    deleted.add(ll);
+                }
+            });
+            groupSize = group.size();
+        });
+    }
+
+    private static List<LatLon> coords(List<Node> nodes) {
+        List<LatLon> l = new ArrayList<>();
+        nodes.forEach(n -> l.add(n.getCoor()));
+        return l;
+    }
+
+    /** @return Anzahl der gemeinsam angeglichenen Gebäude (1 = nur das gewählte) */
+    public int getGroupSize() {
+        return groupSize;
     }
 
     /** @return bisherige Umrisse in OSM (leer bei Neuanlage) */

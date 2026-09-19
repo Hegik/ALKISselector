@@ -21,6 +21,7 @@ einen Dienst oder ein Land gebunden.
 | **Vergleich alt/neu** | Neue Geometrie kräftig, bisherige OSM-Geometrie blau gestrichelt, Verschiebungen als Pfeile, neue/gelöschte Knoten markiert. **V** schaltet die Karte zwischen „alt“ (heute) und „neu“ (nach der Übernahme) um |
 | **Anpassung an Nachbarn** | Neue Gebäude schließen ohne Überlappung und ohne Spalt an vorhandene OSM-Gebäude an (gemeinsame Knoten, Überstand wird abgeschnitten) |
 | **Neuanlage mit Attributen** | `building=*` aus der Gebäudefunktion, Adresse aus der Lagebezeichnung, Name, Geschosse; im Dialog editierbar |
+| **Geführte Reihenfolge** | ALKIS ist maßgeblich: Weicht ein angrenzendes OSM-Gebäude ab, wird es vor dem Anbau eines neuen Objekts an ALKIS angeglichen (Empfehlung „An ALKIS angleichen“). Gebäude mit gemeinsamen Ecken werden vollständig gemeinsam angeglichen, damit keine Winkel verzerrt werden |
 | **Geometrie ersetzen** | Bei abweichenden Gebäuden bleiben ID, Historie und Tags erhalten, Tags werden nur ergänzt. Verbindungen zu angrenzenden Gebäuden, Wegen und Eingängen bleiben erhalten |
 | **ALKIS-Karte** | ALKIS-WMS als Ebene zum visuellen Abgleich: 50 % Deckkraft, liegt automatisch immer über dem Luftbild |
 | **Flurstücke** | Nur als Hintergrundebene, werden nie übernommen |

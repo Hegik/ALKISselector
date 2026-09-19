@@ -96,15 +96,15 @@ class PreviewAfterNeighbourChangeTest {
                 Collections.emptyList(), Double.NaN, Double.NaN, null), "Überdachung");
 
         // Stand bei „Ausschnitt analysieren“: das Vordach wird an das ALTE OSM-Haus (Ostwand x = 10) angepasst
-        roof.setFit(ApplyAction.computeFit(roof, ds, crs), crs);
-        ChangePreview stale = ChangePreview.of(roof, crs);
+        roof.setFit(ApplyAction.computeFit(roof, session), crs);
+        ChangePreview stale = ChangePreview.of(roof, session);
 
         // Haus ersetzen → Ostwand liegt jetzt bei x = 9,7
         assertNotNull(new ApplyAction(session).apply(houseC));
 
         // Vorschau neu (wie beim Auswählen im Dialog) und Übernahme vergleichen
-        roof.setFit(ApplyAction.computeFit(roof, ds, crs), crs);
-        ChangePreview fresh = ChangePreview.of(roof, crs);
+        roof.setFit(ApplyAction.computeFit(roof, session), crs);
+        ChangePreview fresh = ChangePreview.of(roof, session);
         assertNotNull(new ApplyAction(session).apply(roof));
         Way created = (Way) ds.getSelected().iterator().next();
 

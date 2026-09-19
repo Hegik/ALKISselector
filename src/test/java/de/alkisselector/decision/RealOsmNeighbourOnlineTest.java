@@ -93,11 +93,16 @@ class RealOsmNeighbourOnlineTest {
         int replaced = 0;
         int replaceConflicts = 0;
         for (Candidate c : session.getCandidates()) {
-            if (c.getMatchClass() == MatchClass.ABWEICHEND && c.getBuilding().isSimple() && c.getMatch().getPartner() != null
+            if (c.getStatus() != Candidate.Status.OFFEN) {
+                continue; // bereits mit einem Nachbarn gemeinsam angeglichen
+            }
+            // geführte Reihenfolge wie im Dialog: abweichende und anzugleichende Gebäude zuerst (Listenreihenfolge)
+            if (c.isReplacement() && c.getBuilding().isSimple() && c.getMatch().getPartner() != null
                     && c.getMatch().getPartner().getPrimitive() instanceof Way) {
                 if (c.getFit() != null && c.getFit().isConflict()) {
                     replaceConflicts++;
                     System.out.println("  Konflikt " + c.getTitle() + ": " + c.getFit().getHints());
+                    c.setStatus(Candidate.Status.VERWORFEN); // Nutzer verwirft → Anbau passt sich an OSM an
                     continue;
                 }
                 Way w = (Way) c.getMatch().getPartner().getPrimitive();
@@ -108,7 +113,9 @@ class RealOsmNeighbourOnlineTest {
                         connected.add(n);
                     }
                 }
-                assertTrue(new ApplyAction(session).apply(c) != null);
+                ApplyAction action = new ApplyAction(session);
+                assertTrue(action.apply(c) != null);
+                action.getAppliedGroup().forEach(m -> m.setStatus(Candidate.Status.UEBERNOMMEN));
                 replaced++;
                 for (org.openstreetmap.josm.data.osm.Node n : connected) {
                     assertTrue(w.getNodes().contains(n), c.getTitle() + ": Verbindung über Knoten " + n.getUniqueId() + " verloren");

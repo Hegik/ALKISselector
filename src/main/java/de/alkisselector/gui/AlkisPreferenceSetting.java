@@ -242,6 +242,7 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         threshold(p, "Min. IoU für „abweichend“ (0–1):", AlkisSettings.DEVIATING_MIN_IOU, 0, 1, 0.05);
         section(p, "Übernahme und Analyse");
         threshold(p, "An Nachbargebäude anschließen bis (m):", AlkisSettings.FIT_TOLERANCE, 0, 2, 0.1);
+        threshold(p, "Nachbar vorher angleichen ab Abweichung (m):", AlkisSettings.STRICT_ALIGN, 0.01, 1, 0.01);
         clipOverlaps.setSelected(AlkisSettings.isClipOverlaps());
         p.add(clipOverlaps, GBC.eol().insets(10, 2, 0, 2));
         threshold(p, "Suchradius für vorhandene Adressen (m):", AlkisSettings.ADDRESS_SEARCH_RADIUS, 0, 500, 10);

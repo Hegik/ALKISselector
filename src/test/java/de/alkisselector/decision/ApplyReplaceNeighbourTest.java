@@ -163,7 +163,7 @@ class ApplyReplaceNeighbourTest {
         c.setFit(new NeighbourFitter(0.5, true).fit(g, List.of(), NeighbourWays.keepNodes(house, crs)), List.of());
         AnalysisSession session = new AnalysisSession(DefaultProfiles.nrw(), crs, ds);
 
-        ChangePreview preview = ChangePreview.of(c, crs);
+        ChangePreview preview = ChangePreview.of(c, session);
         java.util.Map<Node, LatLon> before = new java.util.HashMap<>();
         house.getNodes().forEach(n -> before.put(n, n.getCoor()));
         assertNotNull(new ApplyAction(session).apply(c));
@@ -210,7 +210,7 @@ class ApplyReplaceNeighbourTest {
                 List.of(new OsmBuilding(house, polygon(house))), 0.8, 2.0, null));
         c.setFit(new NeighbourFitter(0.5, true).fit(g, List.of(), NeighbourWays.keepNodes(house, crs)), List.of());
 
-        ChangePreview preview = ChangePreview.of(c, crs);
+        ChangePreview preview = ChangePreview.of(c, new AnalysisSession(DefaultProfiles.nrw(), crs, ds));
         assertEquals(4, preview.getCreated().size(), "vier neue Knoten für den Anbau");
         assertTrue(preview.getDeleted().isEmpty());
         for (LatLon[] m : preview.getMoves()) {

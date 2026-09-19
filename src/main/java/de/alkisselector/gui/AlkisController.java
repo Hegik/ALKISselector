@@ -250,11 +250,11 @@ public final class AlkisController implements LayerChangeListener {
         Object token = dataToken();
         if (c != previewCandidate || !token.equals(previewToken)) {
             de.alkisselector.decision.NeighbourFitter.Result fit =
-                    de.alkisselector.decision.ApplyAction.computeFit(c, session.getDataSet(), session.getCrs());
+                    de.alkisselector.decision.ApplyAction.computeFit(c, session);
             if (fit != null) {
                 c.setFit(fit, session.getCrs());
             }
-            preview = de.alkisselector.decision.ChangePreview.of(c, session.getCrs());
+            preview = de.alkisselector.decision.ChangePreview.of(c, session);
             boolean dataChanged = c == previewCandidate;
             previewCandidate = c;
             previewToken = token;

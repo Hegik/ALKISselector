@@ -4,6 +4,8 @@ package de.alkisselector.decision;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -129,6 +131,8 @@ public final class CandidateAnalyzer {
             c.setRecommendation(recommend(c, params.orthoThreshold));
         }
 
+        resolveDependencies(result, osm);
+
         if (area != null && !session.isTruncated()) {
             for (OsmBuilding o : OsmMatcher.findOsmOnly(allGeoms, osm.getBuildings(), area)) {
                 Candidate c = new Candidate(o, new MatchResult(MatchClass.NUR_OSM, List.of(o), Double.NaN, Double.NaN, null));
@@ -137,7 +141,7 @@ public final class CandidateAnalyzer {
             }
         }
         result.sort(SPATIAL_ORDER);
-        session.getCandidates().addAll(result);
+        session.getCandidates().addAll(dependencyOrder(result));
     }
 
     /**
@@ -153,8 +157,7 @@ public final class CandidateAnalyzer {
                 return;
             }
             fit = fitter.fit(c.getGeometry(), osm.getNeighbourWays());
-        } else if (c.getMatchClass() == MatchClass.ABWEICHEND && c.getMatch().getPartner() != null
-                && c.getBuilding().isSimple()) {
+        } else if (c.isReplacement() && c.getMatch().getPartner() != null && c.getBuilding().isSimple()) {
             // beim Ersetzen: an Nachbarn (ohne das zu ersetzende Gebäude) anpassen und
             // Verbindungen zu angrenzenden Wegen/Eingängen festhalten
             Object partner = c.getMatch().getPartner().getPrimitive();
@@ -169,6 +172,69 @@ public final class CandidateAnalyzer {
             return;
         }
         c.setFit(fit, crs);
+    }
+
+    /**
+     * Neue Objekte werden an vorhandene OSM-Gebäude angebaut. Weicht ein solcher Nachbar von seinem
+     * ALKIS-Gegenstück ab, würde die amtliche ALKIS-Geometrie des Neubaus an die ungenaue OSM-Lage
+     * angepasst. Deshalb wird der Nachbar zur Vorbedingung: abweichende Nachbarn müssen erst ersetzt,
+     * fast identische (Abweichung über {@link Params#strictAlign}) erst angeglichen werden.
+     */
+    private void resolveDependencies(List<Candidate> result, OsmSnapshot osm) {
+        Map<Object, Candidate> byPartner = new IdentityHashMap<>();
+        for (Candidate c : result) {
+            OsmBuilding p = c.getMatch().getPartner();
+            if (p != null && (c.getMatchClass() == MatchClass.ABWEICHEND || c.getMatchClass() == MatchClass.IDENTISCH)) {
+                byPartner.put(p.getPrimitive(), c);
+            }
+        }
+        List<Candidate> toAlign = new ArrayList<>();
+        for (Candidate c : result) {
+            if (c.getMatchClass() != MatchClass.NEU || c.getFit() == null) {
+                continue;
+            }
+            for (Object handle : c.getFit().getTouched()) {
+                Candidate n = byPartner.get(handle);
+                if (n == null) {
+                    continue;
+                }
+                boolean needed = n.getMatchClass() == MatchClass.ABWEICHEND
+                        || n.getMatch().getHausdorff() > params.strictAlign;
+                if (!needed || c.getPrerequisites().contains(n)) {
+                    continue;
+                }
+                c.getPrerequisites().add(n);
+                n.getDependents().add(c);
+                if (n.getMatchClass() == MatchClass.IDENTISCH && !n.isAlignRequired()) {
+                    n.setAlignRequired(true);
+                    toAlign.add(n);
+                }
+            }
+        }
+        for (Candidate n : toAlign) {
+            n.setRecommendation(Recommendation.ANGLEICHEN);
+            n.getHints().add(String.format(Locale.GERMAN,
+                    "Weicht bis zu %.0f cm von ALKIS ab – vor dem Anbau angrenzender ALKIS-Objekte angleichen",
+                    n.getMatch().getHausdorff() * 100));
+            fitToNeighbours(n, osm);
+        }
+    }
+
+    /** Stellt jede Vorbedingung direkt vor den ersten Kandidaten, der auf sie wartet. */
+    static List<Candidate> dependencyOrder(List<Candidate> sorted) {
+        List<Candidate> out = new ArrayList<>();
+        java.util.Set<Candidate> placed = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Candidate c : sorted) {
+            for (Candidate p : c.getPrerequisites()) {
+                if (placed.add(p)) {
+                    out.add(p);
+                }
+            }
+            if (placed.add(c)) {
+                out.add(c);
+            }
+        }
+        return out;
     }
 
     private List<List<LatLon>> outlines(AlkisBuilding b) {
@@ -390,6 +456,8 @@ public final class CandidateAnalyzer {
         final double orthoMaxOffset;
         final double orthoMaxOverhang;
         final double addressRadius;
+        /** größte Abweichung (m) eines Nachbarn von ALKIS, bei der ohne vorheriges Angleichen angebaut wird */
+        double strictAlign = 0.05;
         double fitTolerance = 0.5;
         boolean clipOverlaps = true;
 
@@ -422,6 +490,15 @@ public final class CandidateAnalyzer {
             return this;
         }
 
+        /**
+         * @param value größte Abweichung (m) eines Nachbarn, bei der ohne vorheriges Angleichen angebaut wird
+         * @return diese Parameter (für Verkettung)
+         */
+        public Params withStrictAlign(double value) {
+            this.strictAlign = value;
+            return this;
+        }
+
         /** @return Parameter aus den aktuellen Einstellungen */
         public static Params fromSettings() {
             return new Params(
@@ -435,7 +512,8 @@ public final class CandidateAnalyzer {
                     AlkisSettings.ORTHO_MAX_OFFSET.get(),
                     AlkisSettings.ORTHO_MAX_OVERHANG.get(),
                     AlkisSettings.ADDRESS_SEARCH_RADIUS.get())
-                    .withFit(AlkisSettings.FIT_TOLERANCE.get(), AlkisSettings.isClipOverlaps());
+                    .withFit(AlkisSettings.FIT_TOLERANCE.get(), AlkisSettings.isClipOverlaps())
+                    .withStrictAlign(AlkisSettings.STRICT_ALIGN.get());
         }
     }
 }

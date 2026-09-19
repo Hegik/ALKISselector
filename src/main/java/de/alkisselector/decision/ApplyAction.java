@@ -43,12 +43,22 @@ import de.alkisselector.source.CrsTransformer;
 public final class ApplyAction {
 
     private final AnalysisSession session;
+    /** bei der letzten Übernahme gemeinsam angeglichene Kandidaten (inkl. des gewählten) */
+    private List<Candidate> appliedGroup = Collections.emptyList();
 
     /**
      * @param session Analyse-Sitzung
      */
     public ApplyAction(AnalysisSession session) {
         this.session = session;
+    }
+
+    /**
+     * @return Kandidaten, die bei der letzten Übernahme gemeinsam angeglichen wurden (der gewählte
+     *         Kandidat steht an erster Stelle; bei Neuanlagen nur dieser)
+     */
+    public List<Candidate> getAppliedGroup() {
+        return appliedGroup;
     }
 
     /**
@@ -68,12 +78,19 @@ public final class ApplyAction {
         if (MainApplication.getLayerManager().getEditDataSet() != ds) {
             throw new ApplyException("Bitte die Datenebene, für die die Analyse gemacht wurde, als aktive Ebene wählen.");
         }
+        List<Candidate> open = c.getOpenPrerequisites();
+        if (!open.isEmpty()) {
+            throw new ApplyException("Zuerst das angrenzende Gebäude „" + open.get(0).getTitle()
+                    + "“ an ALKIS angleichen (oder verwerfen) – sonst würde die ALKIS-Geometrie an die "
+                    + "abweichende OSM-Lage angepasst.");
+        }
         Map<String, String> tags = selectedTags(c);
         Command cmd;
+        appliedGroup = List.of(c);
         if (c.getMatchClass() == MatchClass.NEU) {
             cmd = applyNew(c, ds, tags);
-        } else if (c.getMatchClass() == MatchClass.ABWEICHEND) {
-            cmd = applyReplace(c, ds, tags);
+        } else if (c.isReplacement()) {
+            cmd = applyReplaceGroup(c, ds);
         } else {
             throw new ApplyException("„" + c.getMatchClass().getLabel() + "“ kann nicht automatisch übernommen werden.");
         }
@@ -97,7 +114,7 @@ public final class ApplyAction {
 
     private Command applyNew(Candidate c, DataSet ds, Map<String, String> tags) throws ApplyException {
         // Anpassung an Nachbargebäude mit dem aktuellen Datenstand (inkl. zuvor übernommener Gebäude)
-        NeighbourFitter.Result fit = computeFit(c, ds, session.getCrs());
+        NeighbourFitter.Result fit = computeFit(c, session);
 
         List<Command> cmds = new ArrayList<>();
         FittedNodes nodes = new FittedNodes(ds, cmds, Collections.emptyList());
@@ -271,12 +288,127 @@ public final class ApplyAction {
     // ------------------------------------------------------------------ Geometrie ersetzen
 
     /**
+     * Ersetzt die Geometrie des gewählten Gebäudes und aller Nachbargebäude seiner Angleichungsgruppe
+     * ({@link #alignmentGroup}) vollständig durch ALKIS – als ein Undo-Schritt. Zuerst werden die
+     * gemeinsamen Knoten der Gruppe auf ihre gemeinsame ALKIS-Ecke gesetzt, danach wird jedes Gebäude
+     * komplett ersetzt. Kein Gebäude wird nur teilweise verschoben, gemeinsame Knoten bleiben gemeinsam.
+     */
+    private Command applyReplaceGroup(Candidate c, DataSet ds) throws ApplyException {
+        List<Candidate> group = alignmentGroup(c, session);
+        List<Command> executed = executeGroup(group, ds);
+        undo(executed);
+        Command all = executed.size() == 1 ? executed.get(0)
+                : new SequenceCommand(group.size() > 1 ? "ALKIS-Geometrie angleichen: " + c.getTitle() + " und "
+                        + (group.size() - 1) + " angrenzende Gebäude" : "ALKIS-Geometrie übernehmen: " + c.getTitle(),
+                        executed);
+        UndoRedoHandler.getInstance().add(all);
+        ds.setSelected(c.getMatch().getPartner().getPrimitive());
+        appliedGroup = group;
+        return all;
+    }
+
+    /**
+     * Führt das Angleichen einer Gruppe Schritt für Schritt aus (ohne Undo-Stapel). Schlägt ein Schritt
+     * fehl, werden die bereits ausgeführten zurückgenommen.
+     * @return ausgeführte Befehle in Reihenfolge – der Aufrufer muss sie wieder zurücknehmen
+     */
+    private List<Command> executeGroup(List<Candidate> group, DataSet ds) throws ApplyException {
+        List<Command> executed = new ArrayList<>();
+        try {
+            Command corners = groupCornerMoves(group, session.getCrs());
+            if (corners != null) {
+                corners.executeCommand();
+                executed.add(corners);
+            }
+            for (Candidate m : group) {
+                // nacheinander: jedes weitere Gebäude sieht die bereits ersetzten Nachbarn
+                Command cmd = buildReplace(m, ds, selectedTags(m));
+                cmd.executeCommand();
+                executed.add(cmd);
+            }
+            return executed;
+        } catch (ApplyException | RuntimeException e) {
+            undo(executed);
+            throw e;
+        }
+    }
+
+    private static void undo(List<Command> executed) {
+        for (int i = executed.size() - 1; i >= 0; i--) {
+            executed.get(i).undoCommand();
+        }
+    }
+
+    /**
+     * Probeausführung für die Vorschau: Die Gruppe des Kandidaten wird genau wie bei der Übernahme
+     * angeglichen, {@code inspect} sieht den Ergebnisstand, danach wird alles zurückgenommen.
+     * @param c Kandidat
+     * @param inspect wird mit der Gruppe im angeglichenen Zustand aufgerufen
+     * @throws ApplyException wenn das Angleichen nicht möglich ist
+     */
+    void simulateReplace(Candidate c, java.util.function.Consumer<List<Candidate>> inspect) throws ApplyException {
+        List<Candidate> group = alignmentGroup(c, session);
+        List<Command> executed = executeGroup(group, session.getDataSet());
+        try {
+            inspect.accept(group);
+        } finally {
+            undo(executed);
+        }
+    }
+
+    /**
+     * Setzt die gemeinsamen Knoten der Gruppenmitglieder auf ihre gemeinsame ALKIS-Ecke. Nur Knoten ohne
+     * Tags, die ausschließlich zu Gebäuden der Gruppe gehören, werden verschoben.
+     * @return Befehl oder {@code null}, wenn nichts zu verschieben ist
+     */
+    static Command groupCornerMoves(List<Candidate> group, CrsTransformer crs) {
+        if (group.size() < 2) {
+            return null;
+        }
+        double tol = AlkisSettings.FIT_TOLERANCE.get();
+        Map<OsmPrimitive, Candidate> byWay = new java.util.IdentityHashMap<>();
+        group.forEach(m -> byWay.put(m.getMatch().getPartner().getPrimitive(), m));
+        Map<Node, double[]> targets = new LinkedHashMap<>();
+        for (Candidate m : group) {
+            Way w = (Way) m.getMatch().getPartner().getPrimitive();
+            for (Node n : new LinkedHashSet<>(w.getNodes())) {
+                if (targets.containsKey(n) || n.hasKeys() || n.getReferrers().size() < 2 || !n.isLatLonKnown()) {
+                    continue;
+                }
+                org.openstreetmap.josm.data.coor.EastNorth en = crs.toProjected(n);
+                double[] corner = nearestPoint(alkisVertices(m), en.east(), en.north(), tol);
+                if (corner == null) {
+                    continue;
+                }
+                boolean ok = true;
+                for (OsmPrimitive ref : n.getReferrers()) {
+                    Candidate o = byWay.get(ref);
+                    if (o == null || nearestPoint(alkisVertices(o), corner[0], corner[1], SAME_ALKIS_CORNER) == null) {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok && Math.hypot(corner[0] - en.east(), corner[1] - en.north()) > 0.001) {
+                    targets.put(n, corner);
+                }
+            }
+        }
+        if (targets.isEmpty()) {
+            return null;
+        }
+        List<Command> moves = new ArrayList<>();
+        targets.forEach((n, t) -> moves.add(new MoveCommand(n, crs.toLatLon(t[0], t[1]))));
+        return new SequenceCommand("Gemeinsame Ecken auf ALKIS setzen", moves);
+    }
+
+    /**
      * Ersetzt die Geometrie eines bestehenden Wegs durch die (an Nachbarn angepasste) ALKIS-Geometrie.
      * Der Weg behält ID, Historie, Tags und Relationen. Knoten, die mit anderen Wegen verbunden sind
      * oder Tags tragen, bleiben an ihrer Position und werden – sofern nahe genug – in den neuen Umriss
      * eingebaut. Die übrigen alten Knoten werden verschoben und wiederverwendet, überzählige gelöscht.
+     * Baut nur die Befehle, führt sie nicht aus.
      */
-    private Command applyReplace(Candidate c, DataSet ds, Map<String, String> tags) throws ApplyException {
+    private Command buildReplace(Candidate c, DataSet ds, Map<String, String> tags) throws ApplyException {
         OsmBuilding partner = c.getMatch().getPartner();
         if (partner == null || !(partner.getPrimitive() instanceof Way)) {
             throw new ApplyException("Geometrie ersetzen ist nur für einfache OSM-Wege möglich.");
@@ -290,7 +422,7 @@ public final class ApplyAction {
         }
         CrsTransformer crs = session.getCrs();
         List<NeighbourFitter.KeepNode> keep = NeighbourWays.keepNodes(old, crs);
-        NeighbourFitter.Result fit = computeFit(c, ds, crs);
+        NeighbourFitter.Result fit = fitReplacement(c, session);
         if (fit.getPolygons().size() != 1 || fit.getPolygons().get(0).size() != 1
                 || fit.getPolygons().get(0).get(0).size() < 3) {
             throw new ApplyException("Die angepasste Geometrie besteht aus mehreren Teilen – bitte manuell bearbeiten.");
@@ -320,10 +452,7 @@ public final class ApplyAction {
         if (!changes.isEmpty()) {
             cmds.add(new ChangePropertyCommand(ds, List.of(old), changes));
         }
-        Command all = new SequenceCommand("ALKIS-Geometrie übernehmen: " + c.getTitle(), cmds);
-        UndoRedoHandler.getInstance().add(all);
-        ds.setSelected(old);
-        return all;
+        return new SequenceCommand("ALKIS-Geometrie übernehmen: " + c.getTitle(), cmds);
     }
 
     /**
@@ -405,14 +534,15 @@ public final class ApplyAction {
      * Gemeinsame Grundlage für Übernahme und Vorschau, damit beide dasselbe Ergebnis zeigen – auch wenn
      * Nachbargebäude seit der Analyse verändert wurden. Muss im EDT oder mit Lesesperre aufgerufen werden.
      * @param c Kandidat
-     * @param ds Datensatz
-     * @param crs Arbeits-CRS
+     * @param session Analyse-Sitzung (Datensatz, Arbeits-CRS und alle Kandidaten)
      * @return Anpassung oder {@code null}, wenn für den Kandidaten keine Übernahme möglich ist
      */
-    public static NeighbourFitter.Result computeFit(Candidate c, DataSet ds, CrsTransformer crs) {
+    public static NeighbourFitter.Result computeFit(Candidate c, AnalysisSession session) {
         if (c.getBuilding() == null) {
             return null;
         }
+        DataSet ds = session.getDataSet();
+        CrsTransformer crs = session.getCrs();
         double tol = AlkisSettings.FIT_TOLERANCE.get();
         NeighbourFitter fitter = new NeighbourFitter(tol, AlkisSettings.isClipOverlaps());
         List<NeighbourFitter.NeighbourWay> all = NeighbourWays.collect(ds, crs, boundsAround(c, tol + 1, crs));
@@ -420,18 +550,132 @@ public final class ApplyAction {
             return fitter.fit(c.getGeometry(), all);
         }
         OsmBuilding partner = c.getMatch().getPartner();
-        if (c.getMatchClass() == MatchClass.ABWEICHEND && partner != null && partner.getPrimitive() instanceof Way
-                && partner.getPrimitive().isUsable() && c.getBuilding().isSimple()) {
-            Way old = (Way) partner.getPrimitive();
-            List<NeighbourFitter.NeighbourWay> neighbours = new ArrayList<>();
-            for (NeighbourFitter.NeighbourWay n : all) {
-                if (n.getHandle() != old) {
-                    neighbours.add(n);
-                }
+        if (c.isReplacement() && replaceable(c)) {
+            // wie bei der Übernahme: gemeinsame Ecken der Angleichungsgruppe liegen dann schon auf ALKIS
+            Command corners = groupCornerMoves(alignmentGroup(c, session), crs);
+            if (corners == null) {
+                return fitReplacement(c, session);
             }
-            return fitter.fit(c.getGeometry(), neighbours, NeighbourWays.keepNodes(old, crs));
+            corners.executeCommand();
+            try {
+                return fitReplacement(c, session);
+            } finally {
+                corners.undoCommand();
+            }
         }
         return null;
+    }
+
+    /**
+     * Anpassung beim Ersetzen eines Gebäudes an den aktuellen Datenstand: Verbindungen zu Nachbarn
+     * (gemeinsame Knoten, Fußwege, Eingänge) bleiben fest und werden in den neuen Umriss eingebaut.
+     * @param c zu ersetzendes Gebäude
+     * @param session Sitzung
+     * @return Anpassung
+     */
+    static NeighbourFitter.Result fitReplacement(Candidate c, AnalysisSession session) {
+        CrsTransformer crs = session.getCrs();
+        double tol = AlkisSettings.FIT_TOLERANCE.get();
+        Way old = (Way) c.getMatch().getPartner().getPrimitive();
+        List<NeighbourFitter.NeighbourWay> neighbours = new ArrayList<>();
+        for (NeighbourFitter.NeighbourWay n : NeighbourWays.collect(session.getDataSet(), crs, boundsAround(c, tol + 1, crs))) {
+            if (n.getHandle() != old) {
+                neighbours.add(n);
+            }
+        }
+        return new NeighbourFitter(tol, AlkisSettings.isClipOverlaps()).fit(c.getGeometry(), neighbours,
+                NeighbourWays.keepNodes(old, crs));
+    }
+
+    /** @return ob die Geometrie des OSM-Partners durch ALKIS ersetzt werden kann */
+    static boolean replaceable(Candidate c) {
+        OsmBuilding p = c.getMatch().getPartner();
+        return (c.getMatchClass() == MatchClass.ABWEICHEND || c.getMatchClass() == MatchClass.IDENTISCH)
+                && c.getBuilding() != null && c.getBuilding().isSimple()
+                && p != null && p.getPrimitive() instanceof Way && p.getPrimitive().isUsable()
+                && ((Way) p.getPrimitive()).isClosed();
+    }
+
+    /**
+     * Angleichungsgruppe eines Gebäudes: das Gebäude selbst und – fortgesetzt – alle Nachbargebäude, mit
+     * denen es einen Knoten teilt, den ALKIS an eine (um mehr als 1 cm) andere Stelle legt, sofern der
+     * Nachbar laut ALKIS dieselbe Ecke hat und selbst angeglichen werden kann. Solche Nachbarn müssen
+     * vollständig mit angeglichen werden, sonst würde ihre Form durch den verschobenen Knoten verzerrt.
+     * @param c Kandidat (steht an erster Stelle)
+     * @param session Sitzung
+     * @return Gruppe
+     */
+    public static List<Candidate> alignmentGroup(Candidate c, AnalysisSession session) {
+        List<Candidate> group = new ArrayList<>();
+        group.add(c);
+        if (!replaceable(c)) {
+            return group;
+        }
+        CrsTransformer crs = session.getCrs();
+        double tol = AlkisSettings.FIT_TOLERANCE.get();
+        Map<OsmPrimitive, Candidate> byPartner = new java.util.IdentityHashMap<>();
+        for (Candidate o : session.getCandidates()) {
+            if (o != c && replaceable(o)
+                    && (o.getStatus() == Candidate.Status.OFFEN || o.getStatus() == Candidate.Status.UEBERSPRUNGEN)) {
+                byPartner.put(o.getMatch().getPartner().getPrimitive(), o);
+            }
+        }
+        java.util.ArrayDeque<Candidate> queue = new java.util.ArrayDeque<>(group);
+        while (!queue.isEmpty()) {
+            Candidate m = queue.poll();
+            Way w = (Way) m.getMatch().getPartner().getPrimitive();
+            List<double[]> corners = alkisVertices(m);
+            for (Node n : new LinkedHashSet<>(w.getNodes())) {
+                if (n.hasKeys() || n.getReferrers().size() < 2 || !n.isLatLonKnown()) {
+                    continue;
+                }
+                org.openstreetmap.josm.data.coor.EastNorth en = crs.toProjected(n);
+                double[] corner = nearestPoint(corners, en.east(), en.north(), tol);
+                if (corner == null || Math.hypot(corner[0] - en.east(), corner[1] - en.north()) <= 0.01) {
+                    continue; // Knoten liegt schon auf der ALKIS-Ecke – Nachbar muss nicht mit
+                }
+                for (OsmPrimitive ref : n.getReferrers()) {
+                    Candidate o = byPartner.get(ref);
+                    if (o != null && !group.contains(o)
+                            && nearestPoint(alkisVertices(o), corner[0], corner[1], SAME_ALKIS_CORNER) != null) {
+                        group.add(o);
+                        queue.add(o);
+                    }
+                }
+            }
+        }
+        return group;
+    }
+
+    /** Abstand (m), bis zu dem zwei ALKIS-Eckpunkte als dieselbe Ecke gelten. */
+    private static final double SAME_ALKIS_CORNER = 0.05;
+
+    private static List<double[]> alkisVertices(Candidate c) {
+        List<double[]> out = new ArrayList<>();
+        for (de.alkisselector.source.AlkisBuilding.Polygon p : c.getBuilding().getPolygons()) {
+            addVertices(out, p.getOuter());
+            p.getHoles().forEach(h -> addVertices(out, h));
+        }
+        return out;
+    }
+
+    private static void addVertices(List<double[]> out, double[] ring) {
+        for (int i = 0; i + 1 < ring.length; i += 2) {
+            out.add(new double[] {ring[i], ring[i + 1]});
+        }
+    }
+
+    private static double[] nearestPoint(List<double[]> pts, double x, double y, double maxDist) {
+        double[] best = null;
+        double bestDist = maxDist;
+        for (double[] p : pts) {
+            double d = Math.hypot(p[0] - x, p[1] - y);
+            if (d <= bestDist) {
+                bestDist = d;
+                best = p;
+            }
+        }
+        return best;
     }
 
     private static Bounds boundsAround(Candidate c, double margin, CrsTransformer crs) {

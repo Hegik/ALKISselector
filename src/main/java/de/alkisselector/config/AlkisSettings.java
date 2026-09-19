@@ -28,6 +28,11 @@ public final class AlkisSettings {
     public static final Setting ORTHO_MAX_OVERHANG = new Setting("ortho.max_overhang", 0.9);
     /** Maximale Fläche (km²) für die Ausschnittsanalyse. */
     public static final Setting MAX_AREA_KM2 = new Setting("analysis.max_area_km2", 1.0);
+    /**
+     * Größte Abweichung (m) eines angrenzenden OSM-Gebäudes von ALKIS, bei der ein neues Objekt direkt
+     * angebaut wird. Weicht der Nachbar stärker ab, wird er vorher an ALKIS angeglichen.
+     */
+    public static final Setting STRICT_ALIGN = new Setting("apply.strict_align", 0.05);
     /** Abstand (m), bis zu dem neue Umrisse an vorhandene Nachbargebäude angeschlossen werden. */
     public static final Setting FIT_TOLERANCE = new Setting("apply.fit_tolerance", 0.5);
     /** Suchradius (m) für vorhandene Adressobjekte mit gleicher Adresse. */

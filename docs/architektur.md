@@ -109,9 +109,49 @@ Geprüft mit echten Daten im Münsteraner Kreuzviertel (`RealOsmNeighbourOnlineT
 
 - 17 neue Gebäude grenzten an OSM-Gebäude, 8 davon wurden abgeschnitten. Nach der Übernahme
   überlappte keines ein OSM-Gebäude.
-- 29 abweichende Gebäude wurden ersetzt, ohne Überlappung und ohne verlorene Verbindung. 2 wurden
-  als Konflikt zurückgehalten, weil eine Zufahrt bzw. ein Nebengebäude 0,5–0,6 m neben dem
-  ALKIS-Umriss angebunden war.
+- 35 abweichende bzw. anzugleichende Gebäude wurden ersetzt, ohne Überlappung und ohne verlorene
+  Verbindung. 2 wurden als Konflikt zurückgehalten, weil eine Zufahrt bzw. ein Nebengebäude
+  0,5–0,6 m neben dem ALKIS-Umriss angebunden war.
+
+## Geführte Reihenfolge (ALKIS ist maßgeblich)
+
+Ein neues Objekt wird an die **vorhandenen** OSM-Nachbarn angepasst. Liegt ein Nachbar ungenau,
+würde die amtliche ALKIS-Geometrie des Neubaus an diese ungenaue Lage gezogen. Deshalb gilt für
+berührende Nachbarn eine besonders hohe Übereinstimmung (`CandidateAnalyzer.resolveDependencies`):
+
+- Die Analyse merkt sich, an welche OSM-Gebäude ein neues Objekt angepasst wurde
+  (`NeighbourFitter.Result.getTouched`).
+- Ist ein solcher Nachbar *abweichend* oder weicht er als *identisch* eingestufter Nachbar um mehr
+  als 5 cm (einstellbar: „Nachbar vorher angleichen ab Abweichung“) von seinem ALKIS-Gegenstück ab,
+  wird er zur **Vorbedingung** des Neubaus. Fast identische Nachbarn bekommen dann die Empfehlung
+  **„An ALKIS angleichen“** (Enter) statt „Nichts zu tun“.
+- Die Liste ist **abhängigkeitsbasiert sortiert**: Jede Vorbedingung steht direkt vor dem ersten
+  Objekt, das auf sie wartet (nicht erst alle Änderungen, dann alle Neubauten).
+- Wird ein Neubau übernommen, solange eine Vorbedingung noch offen oder übersprungen ist, springt
+  der Dialog zum Nachbarn und erklärt warum. Verwirft der Nutzer den Nachbarn, wird der Neubau wie
+  bisher an die OSM-Lage angepasst.
+- Nach dem Angleichen des Nachbarn wird die Anpassung des Neubaus mit dem aktuellen Datenstand neu
+  gerechnet. Er schließt dann exakt an der amtlichen Wand an.
+
+### Gemeinsames Angleichen (Angleichungsgruppe)
+
+Würde beim Angleichen nur ein gemeinsamer Eckknoten verschoben, verzerrte das die Winkel des
+Nachbarn. Deshalb wird ein Gebäude **immer vollständig** angeglichen – alle Ecken – und Nachbarn,
+die mitbewegt werden müssten, kommen mit in die Gruppe (`ApplyAction.alignmentGroup`):
+
+- Teilt das Gebäude einen Knoten mit einem Nachbargebäude, und legt ALKIS diese Ecke um mehr als
+  1 cm anders, wird der Nachbar Mitglied der Gruppe, sofern er ein offenes ersetzbares
+  ALKIS-Gegenstück mit **derselben** ALKIS-Ecke hat. Das setzt sich über weitere gemeinsame Knoten
+  fort (Reihenhauszeile).
+- Übernahme: Zuerst werden die gemeinsamen Knoten der Gruppe auf ihre gemeinsame ALKIS-Ecke
+  gesetzt (nur Knoten ohne Tags, die ausschließlich zu Gruppengebäuden gehören), danach wird jedes
+  Gruppengebäude komplett ersetzt. Alles zusammen ist **ein** Undo-Schritt, alle Mitglieder gelten
+  als übernommen, „Zurücksetzen“ setzt die ganze Gruppe zurück.
+- Kann ein Nachbar nicht mit angeglichen werden (kein ALKIS-Gegenstück, andere ALKIS-Ecke, bereits
+  entschieden), bleibt der gemeinsame Knoten fest und der Nachbar unverändert.
+- Die Vorschau der Gruppe entsteht aus einer Probeausführung derselben Befehle, die sofort wieder
+  zurückgenommen wird – angezeigte und ausgeführte Änderungen sind damit identisch. Der Dialog nennt
+  die Gebäude, die gemeinsam angeglichen werden.
 
 ## Vergleichsansicht (ChangePreview)
 
@@ -167,6 +207,7 @@ Verschiebungen genau den bei der Übernahme ausgeführten entsprechen.
 | `NeighbourFitterTest`, `ApplyNeighbourTest` | Überdachung am Haus: Abschneiden, Spalt schließen, Zwischenknoten, T-Stoß, Konflikt, gemeinsame Knoten im JOSM-Datensatz, ein Undo-Schritt |
 | `PreviewAfterNeighbourChangeTest` | Haus wird ersetzt, danach stimmt die Vorschau des angebauten Vordachs exakt mit dessen Übernahme überein |
 | `ApplyReplaceNeighbourTest` | Reihenhaus ersetzen: gemeinsame Wand bleibt, Eingang mit Fußweg bleibt verbunden, keine Überlappung, ein Undo-Schritt; Vorschau-Pfeile = tatsächliche Verschiebungen; Anbau bekommt neue Knoten, alte Ecken bleiben in der Nähe |
+| `GuidedOrderTest` | Fast identisches Haus wird Vorbedingung für das angrenzende Vordach (Empfehlung „An ALKIS angleichen“, Reihenfolge, Vordach vorher gesperrt, danach exakt an der ALKIS-Wand); Reihenhäuser werden gemeinsam und unverzerrt in einem Undo-Schritt angeglichen, Vorschau = Übernahme; ohne Nachbar-Kandidat bleibt die gemeinsame Wand fest |
 | `RealOsmNeighbourOnlineTest` (`-Donline=true`) | echte OSM-Daten gegen ALKIS: Neuanlagen und Ersetzungen ohne Überlappung, ohne verlorene Verbindungen und ohne unverbundene Nachbarknoten neben den neuen Kanten |
 | `OnlinePipelineTest` (`-Donline=true`) | Ende-zu-Ende mit NRW-WFS/DOP inkl. Neuanlage, Ersetzen und Undo |
 | `CalibrationOnlineTest` (`-Donline=true`) | Trefferquote/Fehlalarmrate je Schwelle, siehe `evaluierung.md` |

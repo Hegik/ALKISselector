@@ -55,6 +55,12 @@ public final class Candidate {
     private long shownSince;
     private Command appliedCommand;
     private NeighbourFitter.Result fit;
+    /** Nachbarn, die vor diesem Kandidaten an ALKIS angeglichen bzw. ersetzt werden müssen */
+    private final List<Candidate> prerequisites = new ArrayList<>();
+    /** Kandidaten, die auf diesen warten */
+    private final List<Candidate> dependents = new ArrayList<>();
+    /** „identisch“, aber für einen angrenzenden Neubau exakt an ALKIS anzugleichen */
+    private boolean alignRequired;
     private List<List<LatLon>> fittedOutlines = Collections.emptyList();
 
     /**
@@ -231,6 +237,45 @@ public final class Candidate {
     /** @return angepasste Umrisse (leer, wenn nicht angepasst) */
     public List<List<LatLon>> getFittedOutlines() {
         return fittedOutlines;
+    }
+
+    /** @return Nachbarn, die vorher angeglichen bzw. ersetzt werden müssen */
+    public List<Candidate> getPrerequisites() {
+        return prerequisites;
+    }
+
+    /** @return Kandidaten, die auf diesen warten */
+    public List<Candidate> getDependents() {
+        return dependents;
+    }
+
+    /**
+     * @return noch nicht erledigte Vorbedingungen (offen oder übersprungen). Verworfene Vorbedingungen
+     *         blockieren nicht – der Nutzer hat sich bewusst gegen das Angleichen entschieden.
+     */
+    public List<Candidate> getOpenPrerequisites() {
+        List<Candidate> open = new ArrayList<>();
+        for (Candidate p : prerequisites) {
+            if (p.getStatus() == Status.OFFEN || p.getStatus() == Status.UEBERSPRUNGEN) {
+                open.add(p);
+            }
+        }
+        return open;
+    }
+
+    /** @return ob das (fast identische) OSM-Gebäude exakt an ALKIS angeglichen werden soll */
+    public boolean isAlignRequired() {
+        return alignRequired;
+    }
+
+    public void setAlignRequired(boolean alignRequired) {
+        this.alignRequired = alignRequired;
+    }
+
+    /** @return ob die Übernahme die Geometrie eines bestehenden OSM-Gebäudes ersetzt */
+    public boolean isReplacement() {
+        return match.getMatchClass() == MatchClass.ABWEICHEND
+                || (match.getMatchClass() == MatchClass.IDENTISCH && alignRequired);
     }
 
     /** @return Anzeigename, z. B. {@code Wohngebäude, Hittorfstraße 46 a} */
