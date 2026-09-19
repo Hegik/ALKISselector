@@ -89,7 +89,7 @@ public final class DecisionLog {
                 c.getRecommendation() != null ? c.getRecommendation().name() : "",
                 decision.name(),
                 Long.toString(duration),
-                csv(String.join(" | ", c.getHints())));
+                csv(String.join(" | ", c.getAllHints())));
     }
 
     private static String num(double v) {

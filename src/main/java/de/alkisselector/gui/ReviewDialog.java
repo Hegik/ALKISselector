@@ -224,6 +224,9 @@ public final class ReviewDialog extends ToggleDialog {
         if (c != null && c.getStatus() == Candidate.Status.OFFEN && c.getShownSince() == 0) {
             c.setShownSince(System.currentTimeMillis());
         }
+        // Anpassung an Nachbargebäude mit aktuellem Datenstand neu rechnen (Hinweise, Konflikt, Vorschau)
+        AlkisController.getInstance().getPreview(c);
+        list.repaint();
         updateDetails();
         if (zoom && c != null) {
             zoomTo(c);
@@ -283,9 +286,9 @@ public final class ReviewDialog extends ToggleDialog {
         if (c.getStatus() != Candidate.Status.OFFEN) {
             sb.append(" · Status: <b>").append(c.getStatus()).append("</b>");
         }
-        if (!c.getHints().isEmpty()) {
+        if (!c.getAllHints().isEmpty()) {
             sb.append("<ul style='margin-left:12px'>");
-            c.getHints().forEach(h -> sb.append("<li>").append(esc(h)).append("</li>"));
+            c.getAllHints().forEach(h -> sb.append("<li>").append(esc(h)).append("</li>"));
             sb.append("</ul>");
         } else {
             sb.append("<br>");

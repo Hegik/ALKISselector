@@ -130,10 +130,18 @@ public final class Candidate {
         this.osmOrtho = osmOrtho;
     }
 
+    /**
+     * @return Empfehlung: die Luftbild-Bewertung der Analyse, jedoch „Diskrepanz“, solange die
+     *         (aktuelle) Anpassung an die Nachbargebäude einen Konflikt meldet
+     */
     public Recommendation getRecommendation() {
+        if (recommendation != null && recommendation.isApplicable() && fit != null && fit.isConflict()) {
+            return Recommendation.DISKREPANZ;
+        }
         return recommendation;
     }
 
+    /** @param recommendation Empfehlung aus Vergleich und Luftbildabgleich (ohne Nachbarkonflikt) */
     public void setRecommendation(Recommendation recommendation) {
         this.recommendation = recommendation;
     }
@@ -143,9 +151,18 @@ public final class Candidate {
         return tags;
     }
 
-    /** @return veränderbare Liste der Hinweise */
+    /** @return veränderbare Liste der Hinweise aus Analyse und Luftbild */
     public List<String> getHints() {
         return hints;
+    }
+
+    /** @return alle Hinweise: Analyse und Luftbild sowie die aktuelle Anpassung an Nachbargebäude */
+    public List<String> getAllHints() {
+        List<String> all = new ArrayList<>(hints);
+        if (fit != null) {
+            all.addAll(fit.getHints());
+        }
+        return all;
     }
 
     public Status getStatus() {
@@ -186,6 +203,29 @@ public final class Candidate {
     public void setFit(NeighbourFitter.Result fit, List<List<LatLon>> outlines) {
         this.fit = fit;
         this.fittedOutlines = outlines;
+    }
+
+    /**
+     * Setzt die Anpassung und berechnet die angepassten Umrisse (nur wenn die Anpassung die
+     * ALKIS-Geometrie verändert hat).
+     * @param fit Ergebnis der Anpassung (oder {@code null})
+     * @param crs Arbeits-CRS
+     */
+    public void setFit(NeighbourFitter.Result fit, de.alkisselector.source.CrsTransformer crs) {
+        List<List<LatLon>> outlines = new ArrayList<>();
+        if (fit != null && fit.isModified()) {
+            for (List<List<NeighbourFitter.Vertex>> poly : fit.getPolygons()) {
+                for (List<NeighbourFitter.Vertex> ring : poly) {
+                    List<LatLon> l = new ArrayList<>();
+                    ring.forEach(v -> l.add(crs.toLatLon(v.getX(), v.getY())));
+                    if (!l.isEmpty()) {
+                        l.add(l.get(0));
+                    }
+                    outlines.add(l);
+                }
+            }
+        }
+        setFit(fit, outlines);
     }
 
     /** @return angepasste Umrisse (leer, wenn nicht angepasst) */

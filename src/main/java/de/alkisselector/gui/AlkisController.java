@@ -231,15 +231,46 @@ public final class AlkisController implements LayerChangeListener {
         }
     }
 
+    private Candidate previewCandidate;
+    private Object previewToken;
+    private de.alkisselector.decision.ChangePreview preview;
+
     /**
+     * Liefert die Vorschau der Änderungen für einen Kandidaten. Die Anpassung an Nachbargebäude wird
+     * dabei mit dem <em>aktuellen</em> Datenstand neu berechnet (wie bei der Übernahme), sobald der
+     * Kandidat gewechselt oder die Daten verändert wurden – z. B. nachdem ein Nachbargebäude übernommen
+     * wurde. Hinweise und Konfliktstatus des Kandidaten werden dabei aktualisiert.
      * @param c Kandidat
-     * @return Vorschau der Änderungen (mit aktuellem Datenstand) oder {@code null}
+     * @return Vorschau oder {@code null}
      */
     public de.alkisselector.decision.ChangePreview getPreview(Candidate c) {
         if (c == null || session == null || c.getStatus() != Candidate.Status.OFFEN) {
             return null;
         }
-        return de.alkisselector.decision.ChangePreview.of(c, session.getCrs());
+        Object token = dataToken();
+        if (c != previewCandidate || !token.equals(previewToken)) {
+            de.alkisselector.decision.NeighbourFitter.Result fit =
+                    de.alkisselector.decision.ApplyAction.computeFit(c, session.getDataSet(), session.getCrs());
+            if (fit != null) {
+                c.setFit(fit, session.getCrs());
+            }
+            preview = de.alkisselector.decision.ChangePreview.of(c, session.getCrs());
+            boolean dataChanged = c == previewCandidate;
+            previewCandidate = c;
+            previewToken = token;
+            if (dataChanged && dialog != null) {
+                // Daten wurden bei ausgewähltem Eintrag verändert: Hinweise im Dialog nachziehen
+                javax.swing.SwingUtilities.invokeLater(dialog::viewModeChanged);
+            }
+        }
+        return preview;
+    }
+
+    /** Merkmal des Datenstands: jede Bearbeitung in JOSM verändert den Undo-/Redo-Stapel. */
+    private static Object dataToken() {
+        org.openstreetmap.josm.data.UndoRedoHandler u = org.openstreetmap.josm.data.UndoRedoHandler.getInstance();
+        return java.util.Arrays.asList(System.identityHashCode(u.getLastCommand()), u.getUndoCommands().size(),
+                u.getRedoCommands().size());
     }
 
     /** @return aktuell im Review-Dialog ausgewählter Kandidat oder {@code null} */

@@ -126,6 +126,13 @@ Für den ausgewählten Eintrag zeigt die Vorschau-Ebene, was die Übernahme ver�
   ALKIS-Menü. Ein Hinweis oben in der Karte zeigt die aktive Ansicht. Jeder neue Eintrag startet
   mit „NEU“.
 
+Vorschau und Übernahme nutzen dieselbe, **mit dem aktuellen Datenstand** gerechnete Anpassung an
+die Nachbarn (`ApplyAction.computeFit`). Sie wird neu berechnet, sobald ein Eintrag ausgewählt wird
+und sobald sich die Daten ändern, erkennbar am Undo-/Redo-Stapel. Wird also zuerst ein Haus
+ersetzt, zeigt das angrenzende neue Vordach danach die Anpassung an die neue Hauswand. Hinweise
+und Konfliktstatus („Diskrepanz“ wegen Überlappung) werden dabei ebenfalls aktualisiert. Die
+Luftbild-Bewertung bleibt die der Analyse.
+
 Die Zuordnung alter Knoten zu neuen Positionen ist dieselbe wie bei der Übernahme
 (`ApplyAction.assignPool`): zuerst das global kürzeste Paar aus altem Knoten und neuer Position,
 dann das nächstkürzere. Alte Knoten und ihre Historie bleiben so an der naheliegenden Ecke. Neue
@@ -158,6 +165,7 @@ Verschiebungen genau den bei der Übernahme ausgeführten entsprechen.
 | `EdgeSupportScorerTest` | synthetische Bilder: passend, versetzt, falsch, leer |
 | `CrsTransformerTest` | UTM ↔ WGS84, URL-Aufbau |
 | `NeighbourFitterTest`, `ApplyNeighbourTest` | Überdachung am Haus: Abschneiden, Spalt schließen, Zwischenknoten, T-Stoß, Konflikt, gemeinsame Knoten im JOSM-Datensatz, ein Undo-Schritt |
+| `PreviewAfterNeighbourChangeTest` | Haus wird ersetzt, danach stimmt die Vorschau des angebauten Vordachs exakt mit dessen Übernahme überein |
 | `ApplyReplaceNeighbourTest` | Reihenhaus ersetzen: gemeinsame Wand bleibt, Eingang mit Fußweg bleibt verbunden, keine Überlappung, ein Undo-Schritt; Vorschau-Pfeile = tatsächliche Verschiebungen; Anbau bekommt neue Knoten, alte Ecken bleiben in der Nähe |
 | `RealOsmNeighbourOnlineTest` (`-Donline=true`) | echte OSM-Daten gegen ALKIS: Neuanlagen und Ersetzungen ohne Überlappung, ohne verlorene Verbindungen und ohne unverbundene Nachbarknoten neben den neuen Kanten |
 | `OnlinePipelineTest` (`-Donline=true`) | Ende-zu-Ende mit NRW-WFS/DOP inkl. Neuanlage, Ersetzen und Undo |

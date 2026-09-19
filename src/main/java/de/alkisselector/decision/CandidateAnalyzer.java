@@ -141,9 +141,9 @@ public final class CandidateAnalyzer {
     }
 
     /**
-     * Berechnet für neue Gebäude die an vorhandene Nachbargebäude angepasste Geometrie
-     * (Vorschau, Hinweise, Konflikterkennung). Die eigentliche Übernahme rechnet mit dem
-     * aktuellen Datenstand erneut.
+     * Berechnet die an vorhandene Nachbargebäude angepasste Geometrie (Vorschau, Hinweise,
+     * Konflikterkennung) auf Basis der OSM-Momentaufnahme. Sobald der Kandidat ausgewählt wird,
+     * rechnet die Oberfläche mit dem aktuellen Datenstand neu ({@link ApplyAction#computeFit}).
      */
     private void fitToNeighbours(Candidate c, OsmSnapshot osm) {
         NeighbourFitter.Result fit;
@@ -168,21 +168,7 @@ public final class CandidateAnalyzer {
         } else {
             return;
         }
-        List<List<LatLon>> outlines = new ArrayList<>();
-        if (fit.isModified()) {
-            for (List<List<NeighbourFitter.Vertex>> poly : fit.getPolygons()) {
-                for (List<NeighbourFitter.Vertex> ring : poly) {
-                    List<LatLon> l = new ArrayList<>();
-                    ring.forEach(v -> l.add(crs.toLatLon(v.getX(), v.getY())));
-                    if (!l.isEmpty()) {
-                        l.add(l.get(0));
-                    }
-                    outlines.add(l);
-                }
-            }
-        }
-        c.setFit(fit, outlines);
-        c.getHints().addAll(fit.getHints());
+        c.setFit(fit, crs);
     }
 
     private List<List<LatLon>> outlines(AlkisBuilding b) {
@@ -356,9 +342,6 @@ public final class CandidateAnalyzer {
      * @return Empfehlung
      */
     static Recommendation recommend(Candidate c, double threshold) {
-        if (c.getFit() != null && c.getFit().isConflict()) {
-            return Recommendation.DISKREPANZ;
-        }
         switch (c.getMatchClass()) {
         case IDENTISCH:
             return Recommendation.NICHTS_ZU_TUN;

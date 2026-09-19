@@ -97,9 +97,7 @@ public final class ApplyAction {
 
     private Command applyNew(Candidate c, DataSet ds, Map<String, String> tags) throws ApplyException {
         // Anpassung an Nachbargebäude mit dem aktuellen Datenstand (inkl. zuvor übernommener Gebäude)
-        double tol = AlkisSettings.FIT_TOLERANCE.get();
-        NeighbourFitter.Result fit = new NeighbourFitter(tol, AlkisSettings.isClipOverlaps())
-                .fit(c.getGeometry(), NeighbourWays.collect(ds, session.getCrs(), boundsAround(c, tol + 1)));
+        NeighbourFitter.Result fit = computeFit(c, ds, session.getCrs());
 
         List<Command> cmds = new ArrayList<>();
         FittedNodes nodes = new FittedNodes(ds, cmds, Collections.emptyList());
@@ -291,16 +289,8 @@ public final class ApplyAction {
             throw new ApplyException("Das OSM-Gebäude wurde inzwischen gelöscht oder verändert.");
         }
         CrsTransformer crs = session.getCrs();
-        double tol = AlkisSettings.FIT_TOLERANCE.get();
-        List<NeighbourFitter.NeighbourWay> neighbours = new ArrayList<>();
-        for (NeighbourFitter.NeighbourWay n : NeighbourWays.collect(ds, crs, boundsAround(c, tol + 1))) {
-            if (n.getHandle() != old) {
-                neighbours.add(n);
-            }
-        }
         List<NeighbourFitter.KeepNode> keep = NeighbourWays.keepNodes(old, crs);
-        NeighbourFitter.Result fit = new NeighbourFitter(tol, AlkisSettings.isClipOverlaps())
-                .fit(c.getGeometry(), neighbours, keep);
+        NeighbourFitter.Result fit = computeFit(c, ds, crs);
         if (fit.getPolygons().size() != 1 || fit.getPolygons().get(0).size() != 1
                 || fit.getPolygons().get(0).get(0).size() < 3) {
             throw new ApplyException("Die angepasste Geometrie besteht aus mehreren Teilen – bitte manuell bearbeiten.");
@@ -410,10 +400,43 @@ public final class ApplyAction {
         return out;
     }
 
-    private Bounds boundsAround(Candidate c, double margin) {
+    /**
+     * Passt die ALKIS-Geometrie eines Kandidaten mit dem <em>aktuellen</em> Datenstand an Nachbargebäude an.
+     * Gemeinsame Grundlage für Übernahme und Vorschau, damit beide dasselbe Ergebnis zeigen – auch wenn
+     * Nachbargebäude seit der Analyse verändert wurden. Muss im EDT oder mit Lesesperre aufgerufen werden.
+     * @param c Kandidat
+     * @param ds Datensatz
+     * @param crs Arbeits-CRS
+     * @return Anpassung oder {@code null}, wenn für den Kandidaten keine Übernahme möglich ist
+     */
+    public static NeighbourFitter.Result computeFit(Candidate c, DataSet ds, CrsTransformer crs) {
+        if (c.getBuilding() == null) {
+            return null;
+        }
+        double tol = AlkisSettings.FIT_TOLERANCE.get();
+        NeighbourFitter fitter = new NeighbourFitter(tol, AlkisSettings.isClipOverlaps());
+        List<NeighbourFitter.NeighbourWay> all = NeighbourWays.collect(ds, crs, boundsAround(c, tol + 1, crs));
+        if (c.getMatchClass() == MatchClass.NEU) {
+            return fitter.fit(c.getGeometry(), all);
+        }
+        OsmBuilding partner = c.getMatch().getPartner();
+        if (c.getMatchClass() == MatchClass.ABWEICHEND && partner != null && partner.getPrimitive() instanceof Way
+                && partner.getPrimitive().isUsable() && c.getBuilding().isSimple()) {
+            Way old = (Way) partner.getPrimitive();
+            List<NeighbourFitter.NeighbourWay> neighbours = new ArrayList<>();
+            for (NeighbourFitter.NeighbourWay n : all) {
+                if (n.getHandle() != old) {
+                    neighbours.add(n);
+                }
+            }
+            return fitter.fit(c.getGeometry(), neighbours, NeighbourWays.keepNodes(old, crs));
+        }
+        return null;
+    }
+
+    private static Bounds boundsAround(Candidate c, double margin, CrsTransformer crs) {
         Envelope env = new Envelope(c.getGeometry().getEnvelopeInternal());
         env.expandBy(margin);
-        CrsTransformer crs = session.getCrs();
         Bounds bounds = new Bounds(crs.toLatLon(env.getMinX(), env.getMinY()));
         bounds.extend(crs.toLatLon(env.getMaxX(), env.getMaxY()));
         bounds.extend(crs.toLatLon(env.getMinX(), env.getMaxY()));
