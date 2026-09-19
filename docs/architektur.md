@@ -113,6 +113,25 @@ Geprüft mit echten Daten im Münsteraner Kreuzviertel (`RealOsmNeighbourOnlineT
   als Konflikt zurückgehalten, weil eine Zufahrt bzw. ein Nebengebäude 0,5–0,6 m neben dem
   ALKIS-Umriss angebunden war.
 
+## Vergleichsansicht (ChangePreview)
+
+Für den ausgewählten Eintrag zeigt die Vorschau-Ebene, was die Übernahme verändern würde:
+
+- **NEU** (Standard): neue Geometrie kräftig, bisherige OSM-Geometrie blau gestrichelt,
+  Verschiebungen als leicht transparente Pfeile (nur ab 12 Pixel Länge, damit nichts überdeckt
+  wird), ○ = neuer Knoten, ✕ = gelöschter Knoten. Bei Neuanlagen zeigen die Pfeile die Anpassung
+  der ALKIS-Eckpunkte an die Nachbarn.
+- **ALT:** nur die heutige OSM-Geometrie, kräftig in Blau.
+- Umschalten mit **V** (Karte oder Review-Liste), dem Button „Alt/Neu umschalten“ oder dem
+  ALKIS-Menü. Ein Hinweis oben in der Karte zeigt die aktive Ansicht. Jeder neue Eintrag startet
+  mit „NEU“.
+
+Die Zuordnung alter Knoten zu neuen Positionen ist dieselbe wie bei der Übernahme
+(`ApplyAction.assignPool`): zuerst das global kürzeste Paar aus altem Knoten und neuer Position,
+dann das nächstkürzere. Alte Knoten und ihre Historie bleiben so an der naheliegenden Ecke. Neue
+Ecken, etwa eines Anbaus, bekommen neue Knoten. Ein Test prüft, dass die angezeigten
+Verschiebungen genau den bei der Übernahme ausgeführten entsprechen.
+
 ## Übernahme (ApplyAction)
 
 - **Neu:** Die Knoten stammen aus der Nachbaranpassung: vorhandene Knoten wiederverwenden, Knoten in
@@ -139,7 +158,7 @@ Geprüft mit echten Daten im Münsteraner Kreuzviertel (`RealOsmNeighbourOnlineT
 | `EdgeSupportScorerTest` | synthetische Bilder: passend, versetzt, falsch, leer |
 | `CrsTransformerTest` | UTM ↔ WGS84, URL-Aufbau |
 | `NeighbourFitterTest`, `ApplyNeighbourTest` | Überdachung am Haus: Abschneiden, Spalt schließen, Zwischenknoten, T-Stoß, Konflikt, gemeinsame Knoten im JOSM-Datensatz, ein Undo-Schritt |
-| `ApplyReplaceNeighbourTest` | Reihenhaus ersetzen: gemeinsame Wand bleibt, Eingang mit Fußweg bleibt verbunden, keine Überlappung, ein Undo-Schritt |
+| `ApplyReplaceNeighbourTest` | Reihenhaus ersetzen: gemeinsame Wand bleibt, Eingang mit Fußweg bleibt verbunden, keine Überlappung, ein Undo-Schritt; Vorschau-Pfeile = tatsächliche Verschiebungen; Anbau bekommt neue Knoten, alte Ecken bleiben in der Nähe |
 | `RealOsmNeighbourOnlineTest` (`-Donline=true`) | echte OSM-Daten gegen ALKIS: Neuanlagen und Ersetzungen ohne Überlappung, ohne verlorene Verbindungen und ohne unverbundene Nachbarknoten neben den neuen Kanten |
 | `OnlinePipelineTest` (`-Donline=true`) | Ende-zu-Ende mit NRW-WFS/DOP inkl. Neuanlage, Ersetzen und Undo |
 | `CalibrationOnlineTest` (`-Donline=true`) | Trefferquote/Fehlalarmrate je Schwelle, siehe `evaluierung.md` |

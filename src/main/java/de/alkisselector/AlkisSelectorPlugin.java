@@ -42,6 +42,7 @@ public class AlkisSelectorPlugin extends Plugin {
         JMenu menu = mainMenu.addMenu("ALKIS", "ALKIS", KeyEvent.VK_K, mainMenu.getDefaultMenuPos(), "Plugin/ALKISselector");
         MainMenu.add(menu, new AlkisActions.AnalyzeViewAction());
         MainMenu.add(menu, mapMode);
+        MainMenu.add(menu, AlkisActions.TOGGLE_VIEW);
         MainMenu.add(menu, new AlkisActions.ClearAction());
         menu.addSeparator();
         MainMenu.add(menu, new AlkisActions.AddWmsLayerAction(false));

@@ -191,6 +191,57 @@ public final class AlkisController implements LayerChangeListener {
         return l;
     }
 
+    /** Ansicht des ausgewählten Kandidaten in der Karte. */
+    public enum ViewMode {
+        /** Zustand nach der Übernahme (Vorschau) mit bisheriger Geometrie und Verschiebungspfeilen. */
+        NEU("NEU – Zustand nach der Übernahme"),
+        /** Heutiger Zustand in OSM. */
+        ALT("ALT – heutiger Stand in OSM");
+
+        private final String label;
+
+        ViewMode(String label) {
+            this.label = label;
+        }
+
+        /** @return Beschriftung für Karte und Dialog */
+        public String getLabel() {
+            return label;
+        }
+    }
+
+    private ViewMode viewMode = ViewMode.NEU;
+
+    /** @return aktuelle Ansicht */
+    public ViewMode getViewMode() {
+        return viewMode;
+    }
+
+    /** Wechselt zwischen alter und neuer Ansicht. */
+    public void toggleViewMode() {
+        setViewMode(viewMode == ViewMode.NEU ? ViewMode.ALT : ViewMode.NEU);
+    }
+
+    /** @param mode neue Ansicht */
+    public void setViewMode(ViewMode mode) {
+        viewMode = mode;
+        repaint();
+        if (dialog != null) {
+            dialog.viewModeChanged();
+        }
+    }
+
+    /**
+     * @param c Kandidat
+     * @return Vorschau der Änderungen (mit aktuellem Datenstand) oder {@code null}
+     */
+    public de.alkisselector.decision.ChangePreview getPreview(Candidate c) {
+        if (c == null || session == null || c.getStatus() != Candidate.Status.OFFEN) {
+            return null;
+        }
+        return de.alkisselector.decision.ChangePreview.of(c, session.getCrs());
+    }
+
     /** @return aktuell im Review-Dialog ausgewählter Kandidat oder {@code null} */
     public Candidate getSelectedCandidate() {
         return dialog != null ? dialog.getSelectedCandidate() : null;

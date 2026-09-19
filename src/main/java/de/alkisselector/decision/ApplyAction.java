@@ -169,6 +169,8 @@ public final class ApplyAction {
         private final List<Command> cmds;
         private final List<Node> pool;
         private final List<Node> created = new ArrayList<>();
+        /** Eckpunkt → wiederverwendeter alter Knoten (nur beim Ersetzen) */
+        private final Map<NeighbourFitter.Vertex, Node> assigned = new java.util.IdentityHashMap<>();
         /** je Nachbarweg: eingefügte Knoten mit Kantenindex und Position */
         private final Map<Way, List<Glue>> glue = new LinkedHashMap<>();
 
@@ -186,6 +188,12 @@ public final class ApplyAction {
 
         /** @return geschlossene Knotenliste für einen Ring */
         List<Node> ringNodes(List<NeighbourFitter.Vertex> ring) {
+            if (!pool.isEmpty()) {
+                // alte Knoten den neuen Positionen mit möglichst kurzen Wegen zuordnen
+                List<NeighbourFitter.Vertex> vs = new ArrayList<>();
+                List<LatLon> targets = freePositions(ring, session.getCrs(), vs);
+                assignPool(targets, pool).forEach((i, n) -> assigned.put(vs.get(i), n));
+            }
             List<Node> wayNodes = new ArrayList<>();
             for (NeighbourFitter.Vertex v : ring) {
                 Node n = node(v);
@@ -215,7 +223,7 @@ public final class ApplyAction {
                     return n;
                 }
             }
-            Node n = takeFromPool(ll);
+            Node n = takeFromPool(v, ll);
             if (n == null) {
                 n = new Node(ll);
                 cmds.add(new AddCommand(ds, n));
@@ -228,24 +236,16 @@ public final class ApplyAction {
             return n;
         }
 
-        /** Nimmt den nächstgelegenen alten Knoten aus dem Pool und verschiebt ihn an die neue Position. */
-        private Node takeFromPool(LatLon ll) {
-            Node best = null;
-            double bestDist = Double.MAX_VALUE;
-            for (Node n : pool) {
-                double d = n.greatCircleDistance(ll);
-                if (d < bestDist) {
-                    bestDist = d;
-                    best = n;
+        /** Nimmt den zugeordneten alten Knoten aus dem Pool und verschiebt ihn an die neue Position. */
+        private Node takeFromPool(NeighbourFitter.Vertex v, LatLon ll) {
+            Node n = assigned.get(v);
+            if (n != null && pool.remove(n)) {
+                if (n.greatCircleDistance(ll) > 0.001) {
+                    cmds.add(new MoveCommand(n, ll));
                 }
+                return n;
             }
-            if (best != null) {
-                pool.remove(best);
-                if (bestDist > 0.001) {
-                    cmds.add(new MoveCommand(best, ll));
-                }
-            }
-            return best;
+            return null;
         }
 
         List<Command> glueCommands() {
@@ -309,12 +309,7 @@ public final class ApplyAction {
         // alte Knoten, die nur zu diesem Gebäude gehören, werden verschoben und wiederverwendet
         Set<Node> keepSet = new HashSet<>();
         keep.forEach(k -> keepSet.add((Node) k.node));
-        List<Node> pool = new ArrayList<>();
-        for (Node n : new LinkedHashSet<>(old.getNodes())) {
-            if (!keepSet.contains(n) && !n.hasKeys() && n.getReferrers().size() == 1) {
-                pool.add(n);
-            }
-        }
+        List<Node> pool = reusableNodes(old, keepSet);
         List<Command> cmds = new ArrayList<>();
         FittedNodes nodes = new FittedNodes(ds, cmds, pool);
         List<Node> newNodes = nodes.ringNodes(fit.getPolygons().get(0).get(0));
@@ -339,6 +334,80 @@ public final class ApplyAction {
         UndoRedoHandler.getInstance().add(all);
         ds.setSelected(old);
         return all;
+    }
+
+    /**
+     * Knoten des bisherigen Gebäudes, die beim Ersetzen verschoben und wiederverwendet werden dürfen
+     * (gehören nur zu diesem Gebäude, keine Tags, nicht festzuhalten). Wird auch von der
+     * {@link ChangePreview} genutzt, damit Vorschau und Übernahme gleich rechnen.
+     * @param old bisheriges Gebäude
+     * @param keep festzuhaltende Knoten
+     * @return wiederverwendbare Knoten in Wegreihenfolge
+     */
+    static List<Node> reusableNodes(Way old, Set<Node> keep) {
+        List<Node> pool = new ArrayList<>();
+        for (Node n : new LinkedHashSet<>(old.getNodes())) {
+            if (!keep.contains(n) && !n.hasKeys() && n.getReferrers().size() == 1) {
+                pool.add(n);
+            }
+        }
+        return pool;
+    }
+
+    /**
+     * Ordnet alte Knoten neuen Positionen zu, sodass die Wege möglichst kurz sind: Zuerst wird das
+     * global kürzeste Paar vergeben, dann das nächstkürzere usw. So bleiben alte Knoten (und ihre
+     * Historie) an der naheliegenden Ecke, und die Verschiebungspfeile der Vorschau sind intuitiv.
+     * @param targets neue Positionen (ohne Duplikate)
+     * @param pool wiederverwendbare alte Knoten
+     * @return Index der Zielposition → zugeordneter alter Knoten
+     */
+    static Map<Integer, Node> assignPool(List<LatLon> targets, List<Node> pool) {
+        List<double[]> pairs = new ArrayList<>();
+        for (int i = 0; i < targets.size(); i++) {
+            for (int j = 0; j < pool.size(); j++) {
+                pairs.add(new double[] {pool.get(j).greatCircleDistance(targets.get(i)), i, j});
+            }
+        }
+        pairs.sort(Comparator.comparingDouble(p -> p[0]));
+        Map<Integer, Node> result = new java.util.HashMap<>();
+        Set<Integer> usedPool = new HashSet<>();
+        for (double[] p : pairs) {
+            int i = (int) p[1];
+            int j = (int) p[2];
+            if (!result.containsKey(i) && !usedPool.contains(j)) {
+                result.put(i, pool.get(j));
+                usedPool.add(j);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Freie Positionen eines Rings in der Reihenfolge, in der sie Knoten benötigen (ohne vorhandene
+     * Knoten und ohne Punkte, die weniger als 1 cm von einem früheren Punkt entfernt sind).
+     * @param ring Eckpunkte
+     * @param crs Arbeits-CRS
+     * @param vertices Ausgabe: die zugehörigen Eckpunkte (gleiche Reihenfolge), darf {@code null} sein
+     * @return Positionen
+     */
+    static List<LatLon> freePositions(List<NeighbourFitter.Vertex> ring, CrsTransformer crs,
+            List<NeighbourFitter.Vertex> vertices) {
+        List<LatLon> out = new ArrayList<>();
+        for (NeighbourFitter.Vertex v : ring) {
+            if (v.getNode() instanceof Node && ((Node) v.getNode()).isUsable()) {
+                continue;
+            }
+            LatLon ll = crs.toLatLon(v.getX(), v.getY());
+            if (out.stream().anyMatch(q -> q.greatCircleDistance(ll) <= 0.01)) {
+                continue;
+            }
+            out.add(ll);
+            if (vertices != null) {
+                vertices.add(v);
+            }
+        }
+        return out;
     }
 
     private Bounds boundsAround(Candidate c, double margin) {

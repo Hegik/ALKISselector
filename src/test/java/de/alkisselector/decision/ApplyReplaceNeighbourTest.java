@@ -138,6 +138,93 @@ class ApplyReplaceNeighbourTest {
         assertFalse(a0.isDeleted());
     }
 
+    @Test
+    void previewArrowsMatchTheActualNodeMovements() throws Exception {
+        ds = new DataSet();
+        MainApplication.getLayerManager().addLayer(new OsmDataLayer(ds, "Vorschau", null));
+        // freistehendes OSM-Haus mit 5 Knoten (einer davon überzählig auf der Südkante)
+        Node a0 = node(0, 0);
+        Node a1 = node(4, 0.1);
+        Node a2 = node(10, 0);
+        Node a3 = node(10, 8);
+        Node a4 = node(0, 8);
+        Way house = way("building", "house", a0, a1, a2, a3, a4, a0);
+        // ALKIS: 1 m nach Osten und 0,5 m nach Norden versetzt, 4 Ecken
+        double[] ring = {E + 1, N + 0.5, E + 11, N + 0.5, E + 11, N + 8.5, E + 1, N + 8.5, E + 1, N + 0.5};
+        AlkisBuilding alkis = new AlkisBuilding("DENW-TEST-B",
+                List.of(new AlkisBuilding.Polygon(ring, Collections.emptyList())), Map.of("funktion", "Wohnhaus"));
+        Geometry g = GeometryComparator.toGeometry(alkis);
+        List<LatLon> ll = new ArrayList<>();
+        for (int i = 0; i < ring.length; i += 2) {
+            ll.add(crs.toLatLon(ring[i], ring[i + 1]));
+        }
+        Candidate c = new Candidate(alkis, g, List.of(ll), new MatchResult(MatchClass.ABWEICHEND,
+                List.of(new OsmBuilding(house, polygon(house))), 0.8, 1.1, null));
+        c.setFit(new NeighbourFitter(0.5, true).fit(g, List.of(), NeighbourWays.keepNodes(house, crs)), List.of());
+        AnalysisSession session = new AnalysisSession(DefaultProfiles.nrw(), crs, ds);
+
+        ChangePreview preview = ChangePreview.of(c, crs);
+        java.util.Map<Node, LatLon> before = new java.util.HashMap<>();
+        house.getNodes().forEach(n -> before.put(n, n.getCoor()));
+        assertNotNull(new ApplyAction(session).apply(c));
+
+        // jede Vorschau-Verschiebung entspricht einem tatsächlich verschobenen Knoten
+        int matched = 0;
+        for (LatLon[] m : preview.getMoves()) {
+            for (Map.Entry<Node, LatLon> e : before.entrySet()) {
+                Node n = e.getKey();
+                if (!n.isDeleted() && e.getValue().greatCircleDistance(m[0]) < 0.001 && n.greatCircleDistance(m[1]) < 0.01) {
+                    matched++;
+                }
+            }
+        }
+        assertEquals(4, preview.getMoves().size(), "vier Ecken werden verschoben");
+        assertEquals(preview.getMoves().size(), matched, "Vorschau und Übernahme verschieben unterschiedlich");
+        // der überzählige Knoten wird gelöscht – genau wie angezeigt
+        assertEquals(1, preview.getDeleted().size());
+        long deleted = before.keySet().stream().filter(Node::isDeleted).count();
+        assertEquals(1, deleted);
+        assertTrue(a1.isDeleted(), "der Knoten auf der Südkante sollte entfallen");
+        assertEquals(before.get(a1).lat(), preview.getDeleted().get(0).lat(), 1e-9);
+        assertTrue(preview.getCreated().isEmpty());
+        assertEquals(1, preview.getOldOutlines().size());
+    }
+
+    @Test
+    void annexGetsNewNodesWhileOldCornersStayNearby() throws Exception {
+        ds = new DataSet();
+        MainApplication.getLayerManager().addLayer(new OsmDataLayer(ds, "Anbau", null));
+        Node a0 = node(0, 0);
+        Node a1 = node(10, 0);
+        Node a2 = node(10, 8);
+        Node a3 = node(0, 8);
+        Way house = way("building", "house", a0, a1, a2, a3, a0);
+        // ALKIS: Haus 0,2 m schmaler plus Anbau an der Westseite (die Anbau-Ecken stehen in der
+        // Eckpunktliste VOR den Hausecken – eine reihenfolgebasierte Zuordnung würde die alten Ecken verschleppen)
+        double[] ring = {E - 2, N + 2, E + 0.2, N + 2, E + 0.2, N, E + 10, N, E + 10, N + 8, E + 0.2, N + 8,
+            E + 0.2, N + 6, E - 2, N + 6, E - 2, N + 2};
+        AlkisBuilding alkis = new AlkisBuilding("DENW-TEST-C",
+                List.of(new AlkisBuilding.Polygon(ring, Collections.emptyList())), Map.of("funktion", "Wohnhaus"));
+        Geometry g = GeometryComparator.toGeometry(alkis);
+        Candidate c = new Candidate(alkis, g, List.of(), new MatchResult(MatchClass.ABWEICHEND,
+                List.of(new OsmBuilding(house, polygon(house))), 0.8, 2.0, null));
+        c.setFit(new NeighbourFitter(0.5, true).fit(g, List.of(), NeighbourWays.keepNodes(house, crs)), List.of());
+
+        ChangePreview preview = ChangePreview.of(c, crs);
+        assertEquals(4, preview.getCreated().size(), "vier neue Knoten für den Anbau");
+        assertTrue(preview.getDeleted().isEmpty());
+        for (LatLon[] m : preview.getMoves()) {
+            assertTrue(m[0].greatCircleDistance(m[1]) < 0.3, "alte Ecke wandert zu weit: " + m[0].greatCircleDistance(m[1]));
+        }
+        assertNotNull(new ApplyAction(new AnalysisSession(DefaultProfiles.nrw(), crs, ds)).apply(c));
+        // alte Ecken bleiben die Ecken des Hauses (Historie bleibt an der richtigen Stelle)
+        assertEquals(E + 0.2, crs.toProjected(a0).east(), 0.01);
+        assertEquals(N, crs.toProjected(a0).north(), 0.01);
+        assertEquals(E + 0.2, crs.toProjected(a3).east(), 0.01);
+        assertEquals(N + 8, crs.toProjected(a3).north(), 0.01);
+        assertEquals(9, house.getNodesCount());
+    }
+
     private Geometry polygon(Way w) {
         double[] xy = new double[w.getNodesCount() * 2];
         for (int i = 0; i < w.getNodesCount(); i++) {

@@ -62,7 +62,9 @@ import de.alkisselector.ortho.OrthoResult;
 public final class ReviewDialog extends ToggleDialog {
 
     private static final String KEYS_HELP = "<small>Enter = übernehmen · Umschalt+Enter = trotz Diskrepanz übernehmen · "
-            + "Entf = verwerfen · Leertaste = überspringen</small>";
+            + "Entf = verwerfen · Leertaste = überspringen · V = alt/neu umschalten</small>";
+    private static final String LEGEND = "<small>Karte: <b>kräftig</b> = neu · <font color='#3090ff'><b>blau gestrichelt</b></font>"
+            + " = bisher in OSM · Pfeile = Verschiebung · ○ = neuer Knoten · <font color='#e02020'>✕</font> = gelöschter Knoten</small>";
 
     private final CandidateTableModel listModel = new CandidateTableModel();
     private final JTable list = new JTable(listModel);
@@ -106,7 +108,7 @@ public final class ReviewDialog extends ToggleDialog {
 
         createLayout(split, false, Arrays.asList(
                 new SideButton(acceptAction), new SideButton(forceAction), new SideButton(rejectAction),
-                new SideButton(skipAction), new SideButton(undoAction)));
+                new SideButton(skipAction), new SideButton(undoAction), new SideButton(AlkisActions.TOGGLE_VIEW)));
         filter.addActionListener(e -> {
             Candidate current = getSelectedCandidate();
             listModel.setFilter((CandidateTableModel.Filter) filter.getSelectedItem());
@@ -136,9 +138,10 @@ public final class ReviewDialog extends ToggleDialog {
         bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK), "alkis-force", forceAction);
         bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "alkis-reject", rejectAction);
         bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "alkis-skip", skipAction);
+        bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), "alkis-toggle-view", AlkisActions.TOGGLE_VIEW);
     }
 
-    private static void bind(JComponent c, KeyStroke ks, String name, AbstractAction action) {
+    private static void bind(JComponent c, KeyStroke ks, String name, javax.swing.Action action) {
         c.getInputMap(JComponent.WHEN_FOCUSED).put(ks, name);
         c.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(ks, name);
         c.getActionMap().put(name, action);
@@ -214,6 +217,10 @@ public final class ReviewDialog extends ToggleDialog {
 
     private void onSelectionChanged(boolean zoom) {
         Candidate c = getSelectedCandidate();
+        if (AlkisController.getInstance().getViewMode() != AlkisController.ViewMode.NEU) {
+            // jeder neue Kandidat startet mit der Vorschau
+            AlkisController.getInstance().setViewMode(AlkisController.ViewMode.NEU);
+        }
         if (c != null && c.getStatus() == Candidate.Status.OFFEN && c.getShownSince() == 0) {
             c.setShownSince(System.currentTimeMillis());
         }
@@ -283,7 +290,10 @@ public final class ReviewDialog extends ToggleDialog {
         } else {
             sb.append("<br>");
         }
-        sb.append(KEYS_HELP).append("</html>");
+        AlkisController.ViewMode mode = AlkisController.getInstance().getViewMode();
+        sb.append("<b>Ansicht: <font color='").append(mode == AlkisController.ViewMode.ALT ? "#3090ff" : hex(col))
+                .append("'>").append(mode.getLabel()).append("</font></b><br>");
+        sb.append(LEGEND).append("<br>").append(KEYS_HELP).append("</html>");
         details.setText(sb.toString());
         boolean editable = c.getStatus() == Candidate.Status.OFFEN && c.getRecommendation().isApplicable();
         tagModel.setTags(c.getTags(), editable);
@@ -486,6 +496,11 @@ public final class ReviewDialog extends ToggleDialog {
 
     private static String hex(Color c) {
         return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+    }
+
+    /** Wird vom Controller aufgerufen, wenn die Ansicht alt/neu gewechselt wurde. */
+    void viewModeChanged() {
+        updateDetails();
     }
 
     @Override

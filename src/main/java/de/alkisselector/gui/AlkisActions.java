@@ -27,6 +27,9 @@ import de.alkisselector.ortho.OrthoFetcher;
  */
 public final class AlkisActions {
 
+    /** Gemeinsame Instanz (Menü, Review-Dialog, Tastenkürzel V). */
+    public static final ToggleViewAction TOGGLE_VIEW = new ToggleViewAction();
+
     private AlkisActions() {
         // Sammlung
     }
@@ -50,6 +53,23 @@ public final class AlkisActions {
         @Override
         protected void updateEnabledState() {
             setEnabled(getLayerManager().getEditDataSet() != null);
+        }
+    }
+
+    /** Schaltet die Karte für den ausgewählten Kandidaten zwischen „alt“ (heute) und „neu“ (Vorschau) um. */
+    public static final class ToggleViewAction extends JosmAction {
+        /** Erzeugt die Aktion. */
+        public ToggleViewAction() {
+            super("Alt/Neu umschalten", "dialogs/refresh",
+                    "Karte zwischen heutigem Stand (alt) und Zustand nach der Übernahme (neu) umschalten",
+                    Shortcut.registerShortcut("alkisselector:toggleview", "ALKIS: Ansicht alt/neu umschalten",
+                            KeyEvent.VK_V, Shortcut.DIRECT),
+                    false, "alkisselector/toggleview", false);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            AlkisController.getInstance().toggleViewMode();
         }
     }
 

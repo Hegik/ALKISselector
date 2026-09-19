@@ -18,6 +18,7 @@ einen Dienst oder ein Land gebunden.
 | **OSM-Vergleich** | Einstufung *neu / identisch / abweichend / komplex / nur OSM* (IoU, Hausdorff-Distanz) |
 | **Luftbild-Check** | Kantenabgleich mit dem Orthophoto, berücksichtigt Bildversatz, Dachüberstand und Brandwände |
 | **Hybride Entscheidung** | Enter = übernehmen, Umschalt+Enter = trotz Diskrepanz, Entf = verwerfen, Leertaste = überspringen |
+| **Vergleich alt/neu** | Neue Geometrie kräftig, bisherige OSM-Geometrie blau gestrichelt, Verschiebungen als Pfeile, neue/gelöschte Knoten markiert. **V** schaltet die Karte zwischen „alt“ (heute) und „neu“ (nach der Übernahme) um |
 | **Anpassung an Nachbarn** | Neue Gebäude schließen ohne Überlappung und ohne Spalt an vorhandene OSM-Gebäude an (gemeinsame Knoten, Überstand wird abgeschnitten) |
 | **Neuanlage mit Attributen** | `building=*` aus der Gebäudefunktion, Adresse aus der Lagebezeichnung, Name, Geschosse; im Dialog editierbar |
 | **Geometrie ersetzen** | Bei abweichenden Gebäuden bleiben ID, Historie und Tags erhalten, Tags werden nur ergänzt. Verbindungen zu angrenzenden Gebäuden, Wegen und Eingängen bleiben erhalten |
