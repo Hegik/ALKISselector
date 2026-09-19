@@ -120,12 +120,158 @@ public final class NeighbourFitter {
         if (r.keptConnections > 0) {
             r.hints.add(r.keptConnections + " Verbindung(en) zu angrenzenden Wegen bzw. Eingängen bleiben erhalten");
         }
+        if (r.slidConnections > 0) {
+            r.hints.add(r.slidConnections + " angeschlossene Linie(n) bzw. Eingänge bis zur neuen Fassade verlängert "
+                    + "oder gekürzt – die Wand bleibt gerade");
+        }
         return r;
     }
 
     // ------------------------------------------------------------------ Verbundene Knoten festhalten
 
+    /** Größte Strecke (m), um die das Ende einer angeschlossenen Linie verlängert oder gekürzt wird. */
+    static final double MAX_SLIDE = 2.0;
+
     private void insertKeepNode(KeepNode k, Result r) {
+        if (k.slide && slideKeepNode(k, r)) {
+            return;
+        }
+        insertFixedKeepNode(k, r);
+    }
+
+    /**
+     * Verschiebt einen angeschlossenen Knoten auf den neuen Umriss, damit die Wand keinen Knick bekommt:
+     * Endet eine Linie (Zaun, Mauer, Fußweg …) am Gebäude, wird sie in ihrer Richtung verlängert bzw.
+     * gekürzt, bis sie die neue Fassade schneidet. Ein Knoten ohne angeschlossene Linie (z. B. ein
+     * Eingang) wird senkrecht auf die nächste Kante gesetzt.
+     * @return {@code false}, wenn kein geeigneter Schnittpunkt existiert (Knoten bleibt dann fest)
+     */
+    private boolean slideKeepNode(KeepNode k, Result r) {
+        for (List<List<Vertex>> poly : r.polygons) {
+            for (List<Vertex> ring : poly) {
+                for (Vertex a : ring) {
+                    if (a.node == k.node) {
+                        return true; // bereits Teil des Umrisses
+                    }
+                }
+            }
+        }
+        List<Vertex> bestRing = null;
+        int bestIdx = -1;
+        double bestT = Double.MAX_VALUE;
+        double bx = 0;
+        double by = 0;
+        double dx = k.x - k.fromX;
+        double dy = k.y - k.fromY;
+        double len = Math.hypot(dx, dy);
+        if (k.hasFrom && (len < 1e-6 || insideAny(r.polygons, k.fromX, k.fromY))) {
+            return false; // die Linie käme aus dem neuen Gebäude heraus – Knoten bleibt fest
+        }
+        for (List<List<Vertex>> poly : r.polygons) {
+            for (List<Vertex> ring : poly) {
+                for (int i = 0; i < ring.size(); i++) {
+                    Vertex a = ring.get(i);
+                    Vertex b = ring.get((i + 1) % ring.size());
+                    double t;
+                    double[] hit;
+                    if (k.hasFrom) {
+                        // Strahl vom Nachbarknoten der Linie durch den Knoten: erster Schnitt mit der Fassade
+                        hit = intersectRay(k.fromX, k.fromY, dx, dy, a.x, a.y, b.x, b.y);
+                        if (hit == null || hit[2] <= 1e-6) {
+                            continue;
+                        }
+                        t = hit[2];
+                    } else {
+                        double[] p = project(k.x, k.y, a.x, a.y, b.x, b.y);
+                        if (p == null) {
+                            continue;
+                        }
+                        hit = new double[] {p[0], p[1]};
+                        t = p[2];
+                    }
+                    if (t < bestT) {
+                        bestT = t;
+                        bestRing = ring;
+                        bestIdx = i;
+                        bx = hit[0];
+                        by = hit[1];
+                    }
+                }
+            }
+        }
+        if (bestRing == null) {
+            return false;
+        }
+        double shift = Math.hypot(bx - k.x, by - k.y);
+        if (shift > (k.hasFrom ? MAX_SLIDE : tolerance)) {
+            return false;
+        }
+        Vertex v = Vertex.moved(bx, by, k.node);
+        Vertex a = bestRing.get(bestIdx);
+        int bIdx = (bestIdx + 1) % bestRing.size();
+        Vertex b = bestRing.get(bIdx);
+        if (Math.hypot(a.x - bx, a.y - by) < 0.01 && a.node == null && a.glueWay == null) {
+            bestRing.set(bestIdx, v);
+        } else if (Math.hypot(b.x - bx, b.y - by) < 0.01 && b.node == null && b.glueWay == null) {
+            bestRing.set(bIdx, v);
+        } else {
+            bestRing.add(bestIdx + 1, v);
+        }
+        r.keptConnections++;
+        if (shift > 0.01) {
+            r.slidConnections++;
+        }
+        return true;
+    }
+
+    private static boolean insideAny(List<List<List<Vertex>>> polygons, double x, double y) {
+        for (List<List<Vertex>> poly : polygons) {
+            boolean inside = false;
+            for (List<Vertex> ring : poly) {
+                if (insideRing(ring, x, y)) {
+                    inside = !inside; // Außenring an, Innenhof wieder aus
+                }
+            }
+            if (inside) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean insideRing(List<Vertex> ring, double x, double y) {
+        boolean in = false;
+        for (int i = 0, j = ring.size() - 1; i < ring.size(); j = i++) {
+            Vertex a = ring.get(i);
+            Vertex b = ring.get(j);
+            if ((a.y > y) != (b.y > y) && x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) {
+                in = !in;
+            }
+        }
+        return in;
+    }
+
+    /**
+     * Schnitt des Strahls (ox, oy) + s·(dx, dy), s &gt; 0, mit der Strecke a–b.
+     * @return {x, y, Abstand vom Ursprung des Strahls} oder {@code null}
+     */
+    static double[] intersectRay(double ox, double oy, double dx, double dy, double ax, double ay, double bx, double by) {
+        double ex = bx - ax;
+        double ey = by - ay;
+        double den = dx * ey - dy * ex;
+        if (Math.abs(den) < 1e-12) {
+            return null;
+        }
+        double s = ((ax - ox) * ey - (ay - oy) * ex) / den;
+        double u = ((ax - ox) * dy - (ay - oy) * dx) / den;
+        if (s <= 0 || u < -1e-9 || u > 1 + 1e-9) {
+            return null;
+        }
+        double len = Math.hypot(dx, dy);
+        return new double[] {ox + s * dx, oy + s * dy, s * len};
+    }
+
+    private void insertFixedKeepNode(KeepNode k, Result r) {
         List<Vertex> bestRing = null;
         int bestIdx = -1;
         double bestDist = Double.MAX_VALUE;
@@ -627,13 +773,53 @@ public final class NeighbourFitter {
 
     /**
      * Ein vorhandener Knoten des bisherigen Gebäudes, der mit anderen Wegen verbunden ist oder
-     * Tags trägt und daher an seiner Position bleiben muss.
+     * Tags trägt und daher erhalten bleiben muss. Feste Knoten bleiben an ihrer Position; verschiebbare
+     * ({@link #sliding}) werden auf den neuen Umriss gesetzt.
      */
     public static final class KeepNode {
         final Object node;
         final double x;
         final double y;
         final String label;
+        /** darf auf den neuen Umriss verschoben werden */
+        boolean slide;
+        /** Verschiebung entlang der Linie vom Punkt (fromX, fromY) durch den Knoten */
+        boolean hasFrom;
+        double fromX;
+        double fromY;
+
+        /**
+         * Knoten am Ende einer angeschlossenen Linie: wird entlang der Linie auf die neue Fassade geschoben.
+         * @param node Knotenreferenz
+         * @param x Ostwert
+         * @param y Nordwert
+         * @param fromX Ostwert des Nachbarknotens auf der Linie
+         * @param fromY Nordwert des Nachbarknotens auf der Linie
+         * @param label Beschreibung für Hinweise
+         * @return verschiebbarer Knoten
+         */
+        public static KeepNode sliding(Object node, double x, double y, double fromX, double fromY, String label) {
+            KeepNode k = new KeepNode(node, x, y, label);
+            k.slide = true;
+            k.hasFrom = true;
+            k.fromX = fromX;
+            k.fromY = fromY;
+            return k;
+        }
+
+        /**
+         * Knoten ohne angeschlossene Linie (z. B. Eingang): wird senkrecht auf die nächste Kante gesetzt.
+         * @param node Knotenreferenz
+         * @param x Ostwert
+         * @param y Nordwert
+         * @param label Beschreibung für Hinweise
+         * @return verschiebbarer Knoten
+         */
+        public static KeepNode onOutline(Object node, double x, double y, String label) {
+            KeepNode k = new KeepNode(node, x, y, label);
+            k.slide = true;
+            return k;
+        }
 
         /**
          * @param node Knotenreferenz
@@ -663,6 +849,8 @@ public final class NeighbourFitter {
         final int glueSegment;
         /** Position auf der Kante (0..1) */
         final double glueT;
+        /** vorhandener Knoten wird auf (x, y) verschoben */
+        boolean move;
 
         private Vertex(double x, double y, Object node, NeighbourWay glueWay, int glueSegment, double glueT) {
             this.x = x;
@@ -679,6 +867,17 @@ public final class NeighbourFitter {
 
         static Vertex ofNode(double x, double y, Object node) {
             return new Vertex(x, y, node, null, -1, 0);
+        }
+
+        static Vertex moved(double x, double y, Object node) {
+            Vertex v = new Vertex(x, y, node, null, -1, 0);
+            v.move = true;
+            return v;
+        }
+
+        /** @return ob der vorhandene Knoten auf die Position dieses Eckpunkts verschoben wird */
+        public boolean isMove() {
+            return move;
         }
 
         static Vertex glue(double x, double y, NeighbourWay w, int segment, double t) {
@@ -742,6 +941,7 @@ public final class NeighbourFitter {
         double remainingOverlap;
         int sharedPoints;
         int keptConnections;
+        int slidConnections;
         /** Nachbarwege (Handles), an die angeschlossen oder an denen abgeschnitten wurde */
         final java.util.Set<Object> touched = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
 

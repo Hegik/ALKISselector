@@ -77,12 +77,60 @@ public final class NeighbourWays {
                 continue;
             }
             String label = connectionLabel(n, w);
-            if (label != null) {
-                EastNorth en = crs.toProjected(n);
+            if (label == null) {
+                continue;
+            }
+            EastNorth en = crs.toProjected(n);
+            Node from = lineNeighbour(n, w);
+            if (from != null) {
+                EastNorth f = crs.toProjected(from);
+                result.add(NeighbourFitter.KeepNode.sliding(n, en.east(), en.north(), f.east(), f.north(), label));
+            } else if (n.hasKeys() && n.getReferrers().size() == 1) {
+                result.add(NeighbourFitter.KeepNode.onOutline(n, en.east(), en.north(), label));
+            } else {
                 result.add(new NeighbourFitter.KeepNode(n, en.east(), en.north(), label));
             }
         }
         return result;
+    }
+
+    /**
+     * Endet genau eine Linie (Zaun, Mauer, Fußweg …) am Knoten des Gebäudes, darf der Knoten entlang
+     * dieser Linie auf die neue Fassade geschoben werden. Nicht bei Gebäuden, Relationen oder mehreren
+     * abgehenden Linien – dort bleibt der Knoten fest.
+     * @return Knoten der Linie, von dem aus verlängert wird, oder {@code null}
+     */
+    static Node lineNeighbour(Node n, Way owner) {
+        Node from = null;
+        for (OsmPrimitive ref : n.getReferrers()) {
+            if (ref == owner || ref.isDeleted()) {
+                continue;
+            }
+            if (!(ref instanceof Way) || OsmMatcher.isBuilding(ref) || isBuildingOutline((Way) ref)) {
+                return null;
+            }
+            Way line = (Way) ref;
+            List<Node> nodes = line.getNodes();
+            for (int i = 0; i < nodes.size(); i++) {
+                if (nodes.get(i) != n) {
+                    continue;
+                }
+                for (int j : new int[] {i - 1, i + 1}) {
+                    Node m = j >= 0 && j < nodes.size() ? nodes.get(j) : null;
+                    if (line.isClosed() && m == null) {
+                        m = nodes.get(j < 0 ? nodes.size() - 2 : 1);
+                    }
+                    if (m == null || m == n || owner.containsNode(m)) {
+                        continue; // Linie verläuft entlang der Wand
+                    }
+                    if (from != null && from != m) {
+                        return null; // mehrere Richtungen
+                    }
+                    from = m;
+                }
+            }
+        }
+        return from != null && from.isLatLonKnown() ? from : null;
     }
 
     /**

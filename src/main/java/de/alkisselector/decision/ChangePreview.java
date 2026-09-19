@@ -95,6 +95,16 @@ public final class ChangePreview {
         Set<Node> keep = new HashSet<>();
         NeighbourWays.keepNodes(old, crs).forEach(k -> keep.add((Node) k.node));
         List<Node> pool = ApplyAction.reusableNodes(old, keep);
+        // angeschlossene Linien/Eingänge, die auf die neue Fassade geschoben werden
+        for (NeighbourFitter.Vertex v : ring) {
+            if (v.isMove() && v.getNode() instanceof Node) {
+                Node n = (Node) v.getNode();
+                LatLon ll = crs.toLatLon(v.getX(), v.getY());
+                if (n.greatCircleDistance(ll) > 0.001) {
+                    moves.add(new LatLon[] {n.getCoor(), ll});
+                }
+            }
+        }
         // vorhandene Knoten (Nachbarn, festgehaltene) bleiben an ihrem Platz; die übrigen Positionen
         // werden wie bei der Übernahme mit alten Knoten besetzt (kürzeste Wege zuerst)
         List<LatLon> targets = ApplyAction.freePositions(ring, crs, null);

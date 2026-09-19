@@ -113,11 +113,15 @@ class ApplyReplaceNeighbourTest {
         // keine Überlappung zwischen den Häusern
         double ov = GeometryComparator.intersectionArea(polygon(houseA), polygon(houseB));
         assertTrue(ov < 0.01, "Überlappung " + ov);
-        // Eingang mit Fußweg bleibt verbunden und unverändert
+        // Eingang mit Fußweg bleibt verbunden; der Fußweg wird bis zur neuen Südwand verlängert, damit die
+        // Wand keinen Knick bekommt. Die Südwand läuft von der ALKIS-Ecke (0,1|0,2) zur festen gemeinsamen
+        // Ecke mit Haus B (10|0), der Eingang liegt genau auf dieser Geraden.
         assertTrue(houseA.getNodes().contains(entrance), "Eingang nicht mehr Teil des Gebäudes");
         assertTrue(footway.getNodes().contains(entrance));
         assertFalse(entrance.isDeleted());
-        assertEquals(crs.toLatLon(E + 5, N).lat(), entrance.lat(), 1e-9);
+        EastNorth ent = crs.toProjected(entrance);
+        assertEquals(E + 5, ent.east(), 0.01);
+        assertEquals(N + 0.2 - 0.2 * (4.9 / 9.9), ent.north(), 0.01);
         // die übrigen Ecken liegen auf der ALKIS-Geometrie
         EastNorth nw = null;
         for (Node n : houseA.getNodes()) {

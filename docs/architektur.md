@@ -100,10 +100,21 @@ nie verschoben.
 
 **Beim Ersetzen abweichender Gebäude** gilt dasselbe, gerechnet gegen alle Nachbarn außer dem zu
 ersetzenden Gebäude selbst. Zusätzlich bleiben **Verbindungen erhalten**: Knoten des alten Gebäudes,
-die zu anderen Wegen gehören (Nachbargebäude, Fußwege, Zufahrten, Mauern), Mitglied einer Relation
-sind oder Tags tragen (z. B. `entrance=*`), werden nicht verschoben. Liegen sie höchstens 0,5 m vom
-neuen Umriss entfernt, werden sie an ihrer Position in den Umriss eingebaut. Sonst lautet die
-Empfehlung *Diskrepanz*, mit Hinweis auf die Verbindung, die verloren ginge.
+die zu anderen Wegen gehören (Nachbargebäude, Fußwege, Zufahrten, Zäune, Mauern), Mitglied einer
+Relation sind oder Tags tragen (z. B. `entrance=*`), bleiben Teil des Gebäudes. Damit die neue Wand
+dabei **keinen Knick** bekommt, gilt:
+
+- **Endet genau eine Linie am Knoten** (Zaun, Mauer, Fußweg, Zufahrt), wird die Linie in ihrer
+  Richtung verlängert oder gekürzt, bis sie die ALKIS-Fassade schneidet (höchstens 2 m). Der Knoten
+  wandert auf diesen Schnittpunkt, die Linie bleibt gerade und angeschlossen. Kommt die Linie aus dem
+  künftigen Gebäude heraus, bleibt der Knoten fest.
+- **Eingänge ohne Linie** werden senkrecht auf die nächste neue Wand gesetzt (höchstens 0,5 m).
+- **Fest** bleiben Knoten, die zu Nachbargebäuden oder Relationen gehören oder an denen mehrere Linien
+  abgehen. Liegen sie höchstens 0,5 m vom neuen Umriss entfernt, werden sie an ihrer Position in den
+  Umriss eingebaut. Sonst lautet die Empfehlung *Diskrepanz*, mit Hinweis auf die Verbindung, die
+  verloren ginge.
+
+Die Vorschau zeigt verschobene Linienenden als Pfeile.
 
 Geprüft mit echten Daten im Münsteraner Kreuzviertel (`RealOsmNeighbourOnlineTest`):
 
@@ -111,7 +122,8 @@ Geprüft mit echten Daten im Münsteraner Kreuzviertel (`RealOsmNeighbourOnlineT
   überlappte keines ein OSM-Gebäude.
 - 35 abweichende bzw. anzugleichende Gebäude wurden ersetzt, ohne Überlappung und ohne verlorene
   Verbindung. 2 wurden als Konflikt zurückgehalten, weil eine Zufahrt bzw. ein Nebengebäude
-  0,5–0,6 m neben dem ALKIS-Umriss angebunden war.
+  0,5–0,6 m neben dem ALKIS-Umriss angebunden war. Seit Linienenden bis zur Fassade verlängert
+  werden, bleibt nur noch einer übrig (ein Nebengebäude mit gemeinsamem Knoten).
 
 ## Geführte Reihenfolge (ALKIS ist maßgeblich)
 
@@ -207,6 +219,7 @@ Verschiebungen genau den bei der Übernahme ausgeführten entsprechen.
 | `NeighbourFitterTest`, `ApplyNeighbourTest` | Überdachung am Haus: Abschneiden, Spalt schließen, Zwischenknoten, T-Stoß, Konflikt, gemeinsame Knoten im JOSM-Datensatz, ein Undo-Schritt |
 | `PreviewAfterNeighbourChangeTest` | Haus wird ersetzt, danach stimmt die Vorschau des angebauten Vordachs exakt mit dessen Übernahme überein |
 | `ApplyReplaceNeighbourTest` | Reihenhaus ersetzen: gemeinsame Wand bleibt, Eingang mit Fußweg bleibt verbunden, keine Überlappung, ein Undo-Schritt; Vorschau-Pfeile = tatsächliche Verschiebungen; Anbau bekommt neue Knoten, alte Ecken bleiben in der Nähe |
+| `ConnectedLineTest` | Schräger Zaun an der Ostwand wird bis zur 0,3 m weiter östlich liegenden ALKIS-Fassade verlängert (Wand bleibt gerade, Vorschau zeigt den Pfeil); Mauer wird gekürzt; Linie aus dem künftigen Gebäude heraus bleibt fest |
 | `GuidedOrderTest` | Fast identisches Haus wird Vorbedingung für das angrenzende Vordach (Empfehlung „An ALKIS angleichen“, Reihenfolge, Vordach vorher gesperrt, danach exakt an der ALKIS-Wand); Reihenhäuser werden gemeinsam und unverzerrt in einem Undo-Schritt angeglichen, Vorschau = Übernahme; ohne Nachbar-Kandidat bleibt die gemeinsame Wand fest |
 | `RealOsmNeighbourOnlineTest` (`-Donline=true`) | echte OSM-Daten gegen ALKIS: Neuanlagen und Ersetzungen ohne Überlappung, ohne verlorene Verbindungen und ohne unverbundene Nachbarknoten neben den neuen Kanten |
 | `OnlinePipelineTest` (`-Donline=true`) | Ende-zu-Ende mit NRW-WFS/DOP inkl. Neuanlage, Ersetzen und Undo |

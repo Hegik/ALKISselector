@@ -184,6 +184,8 @@ public final class ApplyAction {
         private final List<Command> cmds;
         private final List<Node> pool;
         private final List<Node> created = new ArrayList<>();
+        /** bereits verschobene angeschlossene Knoten */
+        private final Set<Node> moved = new HashSet<>();
         /** Eckpunkt → wiederverwendeter alter Knoten (nur beim Ersetzen) */
         private final Map<NeighbourFitter.Vertex, Node> assigned = new java.util.IdentityHashMap<>();
         /** je Nachbarweg: eingefügte Knoten mit Kantenindex und Position */
@@ -230,7 +232,15 @@ public final class ApplyAction {
 
         private Node node(NeighbourFitter.Vertex v) {
             if (v.getNode() instanceof Node && ((Node) v.getNode()).isUsable()) {
-                return (Node) v.getNode();
+                Node existing = (Node) v.getNode();
+                if (v.isMove() && moved.add(existing)) {
+                    // Ende einer angeschlossenen Linie bzw. Eingang auf die neue Fassade setzen
+                    LatLon target = session.getCrs().toLatLon(v.getX(), v.getY());
+                    if (existing.greatCircleDistance(target) > 0.001) {
+                        cmds.add(new MoveCommand(existing, target));
+                    }
+                }
+                return existing;
             }
             LatLon ll = session.getCrs().toLatLon(v.getX(), v.getY());
             for (Node n : created) {
