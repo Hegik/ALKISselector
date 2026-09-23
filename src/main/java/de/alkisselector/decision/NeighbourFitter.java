@@ -378,11 +378,17 @@ public final class NeighbourFitter {
 
     // ------------------------------------------------------------------ 2./3. Punkte und Kanten
 
+    /** @return Anschlusstoleranz für einen Nachbarn */
+    private double tol(NeighbourWay n) {
+        return Double.isNaN(n.tolerance) ? tolerance : Math.min(tolerance, n.tolerance);
+    }
+
     private List<Vertex> fitRing(Coordinate[] coords, List<NeighbourWay> near, Result r) {
         List<Vertex> ring = new ArrayList<>();
         for (int i = 0; i < coords.length - 1; i++) { // letzter = erster Punkt
-            ring.add(snap(coords[i], near));
+            ring.add(snap(coords[i], near, java.util.Collections.emptySet()));
         }
+        uniqueNodes(coords, ring, near);
         ring = densify(ring, near);
         ring = attachNeighbourNodes(ring, near);
         ring = dedupe(ring);
@@ -401,14 +407,52 @@ public final class NeighbourFitter {
         return ring;
     }
 
-    private Vertex snap(Coordinate c, List<NeighbourWay> near) {
+    /**
+     * Ein Nachbarknoten darf nur eine ALKIS-Ecke ersetzen, sonst fallen zwei Ecken auf einen Punkt
+     * zusammen und eine Ecke geht verloren (schräge Wand). Den Knoten behält die nächstgelegene Ecke,
+     * die übrigen werden ohne ihn neu eingepasst.
+     */
+    private void uniqueNodes(Coordinate[] coords, List<Vertex> ring, List<NeighbourWay> near) {
+        // je Ecke die Knoten, die sie abgeben musste (endlich viele Knoten → die Schleife endet)
+        List<java.util.Set<Object>> excluded = new ArrayList<>();
+        for (int i = 0; i < ring.size(); i++) {
+            excluded.add(new java.util.HashSet<>());
+        }
+        boolean changed = true;
+        while (changed) {
+            changed = false;
+            java.util.Map<Object, Integer> owner = new java.util.HashMap<>();
+            for (int i = 0; i < ring.size() && !changed; i++) {
+                Object node = ring.get(i).node;
+                if (node == null) {
+                    continue;
+                }
+                Integer j = owner.putIfAbsent(node, i);
+                if (j == null) {
+                    continue;
+                }
+                // die weiter entfernte Ecke gibt den Knoten ab
+                double di = coords[i].distance(new Coordinate(ring.get(i).x, ring.get(i).y));
+                double dj = coords[j].distance(new Coordinate(ring.get(j).x, ring.get(j).y));
+                int loser = di < dj ? j : i;
+                excluded.get(loser).add(node);
+                ring.set(loser, snap(coords[loser], near, excluded.get(loser)));
+                changed = true;
+            }
+        }
+    }
+
+    private Vertex snap(Coordinate c, List<NeighbourWay> near, java.util.Set<Object> excludedNodes) {
         // bevorzugt vorhandene Knoten
         Vertex best = null;
         double bestDist = tolerance;
         for (NeighbourWay n : near) {
             for (int i = 0; i < n.size(); i++) {
+                if (excludedNodes.contains(n.nodes.get(i))) {
+                    continue;
+                }
                 double d = Math.hypot(n.x(i) - c.x, n.y(i) - c.y);
-                if (d <= bestDist) {
+                if (d <= bestDist && d <= tol(n)) {
                     bestDist = d;
                     best = Vertex.ofNode(n.x(i), n.y(i), n.nodes.get(i));
                 }
@@ -423,7 +467,7 @@ public final class NeighbourFitter {
             for (int i = 0; i < n.size(); i++) {
                 int j = (i + 1) % n.size();
                 double[] proj = project(c.x, c.y, n.x(i), n.y(i), n.x(j), n.y(j));
-                if (proj != null && proj[2] <= bestDist) {
+                if (proj != null && proj[2] <= bestDist && proj[2] <= tol(n)) {
                     bestDist = proj[2];
                     best = Vertex.glue(proj[0], proj[1], n, i, proj[3]);
                 }
@@ -492,7 +536,7 @@ public final class NeighbourFitter {
                     Vertex a = ring.get(k);
                     Vertex b = ring.get((k + 1) % m);
                     double[] p = project(n.x(i), n.y(i), a.x, a.y, b.x, b.y);
-                    if (p == null || p[2] > bestDist) {
+                    if (p == null || p[2] > bestDist || p[2] > tol(n)) {
                         continue;
                     }
                     // nicht unmittelbar an einem Eckpunkt einfügen (sonst entsteht ein Zickzack)
@@ -613,7 +657,7 @@ public final class NeighbourFitter {
         List<Vertex> bwd = walk(w, pa, pb, false);
         List<Vertex> best = null;
         for (List<Vertex> cand : java.util.Arrays.asList(fwd, bwd)) {
-            if (cand != null && allNearSegment(cand, a, b) && (best == null || cand.size() < best.size())) {
+            if (cand != null && allNearSegment(cand, a, b, tol(w)) && (best == null || cand.size() < best.size())) {
                 best = cand;
             }
         }
@@ -637,7 +681,7 @@ public final class NeighbourFitter {
         return out;
     }
 
-    private boolean allNearSegment(List<Vertex> vs, Vertex a, Vertex b) {
+    private static boolean allNearSegment(List<Vertex> vs, Vertex a, Vertex b, double tolerance) {
         for (Vertex v : vs) {
             double[] p = project(v.x, v.y, a.x, a.y, b.x, b.y);
             if (p == null || p[2] > tolerance) {
@@ -727,6 +771,8 @@ public final class NeighbourFitter {
         final List<Object> nodes;
         final double[] xy;
         final Polygon polygon;
+        /** eigene Anschlusstoleranz (m) oder {@code NaN} = Toleranz des Fitters */
+        double tolerance = Double.NaN;
 
         /**
          * @param handle Referenz auf das OSM-Objekt (z. B. {@code Way})
@@ -756,6 +802,17 @@ public final class NeighbourFitter {
 
         public Object getHandle() {
             return handle;
+        }
+
+        /**
+         * Setzt eine eigene, engere Anschlusstoleranz, z. B. für Nachbarn, die schon exakt auf ALKIS
+         * liegen: An sie wird nur angeschlossen, wo die Punkte laut ALKIS zusammenfallen.
+         * @param tolerance Toleranz (m)
+         * @return dieser Nachbar
+         */
+        public NeighbourWay withTolerance(double tolerance) {
+            this.tolerance = tolerance;
+            return this;
         }
 
         int size() {
@@ -819,6 +876,11 @@ public final class NeighbourFitter {
             KeepNode k = new KeepNode(node, x, y, label);
             k.slide = true;
             return k;
+        }
+
+        /** @return Referenz auf den festzuhaltenden Knoten */
+        public Object getNode() {
+            return node;
         }
 
         /**

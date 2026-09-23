@@ -15,13 +15,15 @@ einen Dienst oder ein Land gebunden.
 |---|---|
 | **Stapel-Review** | Menü *ALKIS → Ausschnitt analysieren* (Strg+Umschalt+K): alle Gebäude im Kartenausschnitt |
 | **Einzelklick** | Modus *ALKIS-Gebäude auswählen* (Strg+Alt+K): Klick auf ein Gebäude |
+| **Prüfmodus** | Modus *ALKIS prüfen* (Strg+Alt+P), startet nach *Ausschnitt analysieren* automatisch: Die Entscheidungstasten gelten immer für den aktuellen Eintrag, auch nach einem Klick in die Karte. Ziehen verschiebt die Karte, ein Klick auf ein ALKIS-Gebäude wählt dessen Eintrag, OSM-Objekte bleiben unberührt. Esc beendet den Modus |
+| **Rückgängig** | Strg+Z nimmt eine Übernahme zurück, der Eintrag ist danach wieder offen und ausgewählt. Strg+Y stellt sie wieder her |
 | **OSM-Vergleich** | Einstufung *neu / identisch / abweichend / komplex / nur OSM* (IoU, Hausdorff-Distanz) |
 | **Luftbild-Check** | Kantenabgleich mit dem Orthophoto, berücksichtigt Bildversatz, Dachüberstand und Brandwände |
-| **Hybride Entscheidung** | Enter = übernehmen, Umschalt+Enter = trotz Diskrepanz, Entf = verwerfen, Leertaste = überspringen |
+| **Hybride Entscheidung** | Enter = übernehmen, Umschalt+Enter = trotz Diskrepanz, Entf = verwerfen, Leertaste = überspringen, Rücktaste = zurücksetzen, V = Ansicht alt/neu, M = Problem melden. Die Taste steht auch im Tooltip der Schaltflächen |
 | **Vergleich alt/neu** | Neue Geometrie kräftig, bisherige OSM-Geometrie blau gestrichelt, Verschiebungen als Pfeile, neue/gelöschte Knoten markiert. **V** schaltet die Karte zwischen „alt“ (heute) und „neu“ (nach der Übernahme) um |
 | **Anpassung an Nachbarn** | Neue Gebäude schließen ohne Überlappung und ohne Spalt an vorhandene OSM-Gebäude an (gemeinsame Knoten, Überstand wird abgeschnitten) |
 | **Neuanlage mit Attributen** | `building=*` aus der Gebäudefunktion, Adresse aus der Lagebezeichnung, Name, Geschosse; im Dialog editierbar |
-| **Geführte Reihenfolge** | ALKIS ist maßgeblich: Weicht ein angrenzendes OSM-Gebäude ab, wird es vor dem Anbau eines neuen Objekts an ALKIS angeglichen (Empfehlung „An ALKIS angleichen“). Gebäude mit gemeinsamen Ecken werden vollständig gemeinsam angeglichen, damit keine Winkel verzerrt werden |
+| **Geführte Reihenfolge** | ALKIS ist maßgeblich: Weicht ein angrenzendes OSM-Gebäude ab, wird es vor dem Anbau eines neuen Objekts an ALKIS angeglichen (Empfehlung „An ALKIS angleichen“). Gebäude mit gemeinsamen Ecken und Nachbarn, die laut ALKIS direkt angrenzen, werden vollständig gemeinsam angeglichen und an den gemeinsamen ALKIS-Ecken verbunden. Jede ALKIS-Ecke bleibt erhalten, an noch abweichend liegende Nachbarn wird nicht angepasst |
 | **Geometrie ersetzen** | Bei abweichenden Gebäuden bleiben ID, Historie und Tags erhalten, Tags werden nur ergänzt. Verbindungen zu angrenzenden Gebäuden, Wegen und Eingängen bleiben erhalten. Am Haus endende Zäune, Mauern und Wege werden bis zur ALKIS-Fassade verlängert oder gekürzt, damit die Wand keinen Knick bekommt |
 | **ALKIS-Karte** | ALKIS-WMS als Ebene zum visuellen Abgleich: 50 % Deckkraft, liegt automatisch immer über dem Luftbild |
 | **Flurstücke** | Nur als Hintergrundebene, werden nie übernommen |
@@ -71,6 +73,8 @@ automatisch angeboten.
 
 1. OSM-Daten für das Gebiet herunterladen.
 2. *ALKIS → Ausschnitt analysieren*. Das Plugin lädt ALKIS, vergleicht und prüft das Luftbild.
+   Berücksichtigt werden nur ALKIS-Gebäude, die vollständig im heruntergeladenen OSM-Bereich liegen.
+   Gebäude am Rand werden übersprungen, sonst würden sie mangels OSM-Daten fälschlich als „neu“ gelten.
 3. Im Seitenfenster **ALKIS-Abgleich** Eintrag für Eintrag entscheiden. Die Karte zoomt jeweils
    formatfüllend auf das Gebäude. Tags lassen sich vor der Übernahme in der Tabelle ändern oder abwählen.
 4. Mit dem JOSM-Validator prüfen und wie gewohnt manuell hochladen.

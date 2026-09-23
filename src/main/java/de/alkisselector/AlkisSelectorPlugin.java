@@ -22,6 +22,7 @@ import de.alkisselector.config.ServiceProfile;
 import de.alkisselector.gui.AlkisActions;
 import de.alkisselector.gui.AlkisController;
 import de.alkisselector.gui.AlkisPreferenceSetting;
+import de.alkisselector.gui.AlkisReviewMapMode;
 import de.alkisselector.gui.AlkisSelectMapMode;
 import de.alkisselector.gui.ReviewDialog;
 
@@ -31,6 +32,7 @@ import de.alkisselector.gui.ReviewDialog;
 public class AlkisSelectorPlugin extends Plugin {
 
     private final AlkisSelectMapMode mapMode = new AlkisSelectMapMode();
+    private final AlkisReviewMapMode reviewMode = new AlkisReviewMapMode();
 
     /**
      * Wird von JOSM beim Laden des Plugins aufgerufen.
@@ -42,6 +44,7 @@ public class AlkisSelectorPlugin extends Plugin {
         JMenu menu = mainMenu.addMenu("ALKIS", "ALKIS", KeyEvent.VK_K, mainMenu.getDefaultMenuPos(), "Plugin/ALKISselector");
         MainMenu.add(menu, new AlkisActions.AnalyzeViewAction());
         MainMenu.add(menu, mapMode);
+        MainMenu.add(menu, reviewMode);
         MainMenu.add(menu, AlkisActions.TOGGLE_VIEW);
         MainMenu.add(menu, new AlkisActions.ClearAction());
         menu.addSeparator();
@@ -63,6 +66,8 @@ public class AlkisSelectorPlugin extends Plugin {
             newFrame.addToggleDialog(dialog);
             AlkisController.getInstance().setDialog(dialog);
             newFrame.addMapMode(new IconToggleButton(mapMode));
+            newFrame.addMapMode(new IconToggleButton(reviewMode));
+            AlkisController.getInstance().setReviewMode(reviewMode);
         } else {
             AlkisController.getInstance().setDialog(null);
         }

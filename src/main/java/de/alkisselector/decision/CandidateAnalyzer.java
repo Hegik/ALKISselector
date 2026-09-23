@@ -73,12 +73,29 @@ public final class CandidateAnalyzer {
      */
     public void analyze(AnalysisSession session, List<AlkisBuilding> buildings, OsmSnapshot osm, Envelope area,
             ProgressMonitor monitor) {
+        analyze(session, buildings, osm, area, null, monitor);
+    }
+
+    /**
+     * Führt die Analyse aus und füllt die Kandidatenliste der Sitzung.
+     * @param session Sitzung
+     * @param buildings geladene ALKIS-Gebäude
+     * @param osm OSM-Momentaufnahme
+     * @param area untersuchter Bereich im Arbeits-CRS für die Suche nach „nur OSM“; {@code null} = nicht suchen
+     * @param loaded Bereich mit heruntergeladenen OSM-Daten ({@link LoadedArea}); Gebäude, die nicht
+     *        vollständig darin liegen, werden übersprungen. {@code null} = keine Einschränkung
+     * @param monitor Fortschrittsanzeige (darf {@code null} sein)
+     */
+    public void analyze(AnalysisSession session, List<AlkisBuilding> buildings, OsmSnapshot osm, Envelope area,
+            Geometry loaded, ProgressMonitor monitor) {
         ProgressMonitor pm = monitor != null ? monitor : NullProgressMonitor.INSTANCE;
         List<AlkisBuilding> kept = new ArrayList<>();
         List<AttributeMapping.Result> mappings = new ArrayList<>();
         List<Geometry> geoms = new ArrayList<>();
+        // alle ALKIS-Umringe, auch übersprungene: sonst würden OSM-Gebäude am Rand als „nur OSM“ gemeldet
         List<Geometry> allGeoms = new ArrayList<>();
         int excluded = 0;
+        int outside = 0;
         for (AlkisBuilding b : buildings) {
             Geometry g;
             try {
@@ -96,11 +113,16 @@ public final class CandidateAnalyzer {
                 excluded++;
                 continue;
             }
+            if (loaded != null && !loaded.covers(g)) {
+                outside++;
+                continue;
+            }
             kept.add(b);
             mappings.add(m);
             geoms.add(g);
         }
         session.setExcludedCount(session.getExcludedCount() + excluded);
+        session.setOutsideCount(session.getOutsideCount() + outside);
 
         pm.setCustomText("Vergleich mit OSM …");
         List<MatchResult> matches = OsmMatcher.classify(geoms, osm.getBuildings(), params.matching);

@@ -19,6 +19,7 @@ public final class AnalysisSession {
     private final DataSet dataSet;
     private final List<Candidate> candidates = new CopyOnWriteArrayList<>();
     private int excludedCount;
+    private int outsideCount;
     private boolean truncated;
 
     /**
@@ -56,6 +57,15 @@ public final class AnalysisSession {
 
     public void setExcludedCount(int excludedCount) {
         this.excludedCount = excludedCount;
+    }
+
+    /** @return Anzahl der ALKIS-Gebäude, die nicht vollständig im geladenen OSM-Bereich liegen und übersprungen wurden */
+    public int getOutsideCount() {
+        return outsideCount;
+    }
+
+    public void setOutsideCount(int outsideCount) {
+        this.outsideCount = outsideCount;
     }
 
     /** @return ob der WFS nicht alle Objekte geliefert hat */

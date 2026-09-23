@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Gebäude (rot, ALKIS-Signatur) mit Lupe: Einträge prüfen -->
+  <path d="M3 20 V10 L8.5 5.5 L14 10 V20 Z" fill="#f4b7a8" stroke="#b3261e" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="15.5" cy="14.5" r="4.2" fill="#fff" fill-opacity="0.85" stroke="#1a5fb4" stroke-width="1.8"/>
+  <path d="M18.6 17.6 L22 21" stroke="#1a5fb4" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

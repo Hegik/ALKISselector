@@ -92,6 +92,8 @@ class RealOsmNeighbourOnlineTest {
         List<String> examples = new ArrayList<>();
         int replaced = 0;
         int replaceConflicts = 0;
+        // bereits durch ALKIS ersetzte Gebäude
+        java.util.Set<Way> replacedWays = new java.util.HashSet<>();
         for (Candidate c : session.getCandidates()) {
             if (c.getStatus() != Candidate.Status.OFFEN) {
                 continue; // bereits mit einem Nachbarn gemeinsam angeglichen
@@ -106,21 +108,46 @@ class RealOsmNeighbourOnlineTest {
                     continue;
                 }
                 Way w = (Way) c.getMatch().getPartner().getPrimitive();
-                // mit anderen Wegen verbundene Knoten vorher merken
-                java.util.Set<org.openstreetmap.josm.data.osm.Node> connected = new java.util.HashSet<>();
+                // Eingänge u. Ä. und die mit anderen Wegen verbundenen Wege vorher merken
+                java.util.Set<org.openstreetmap.josm.data.osm.Node> tagged = new java.util.HashSet<>();
+                java.util.Set<Way> connectedWays = new java.util.HashSet<>();
                 for (org.openstreetmap.josm.data.osm.Node n : w.getNodes()) {
-                    if (n.getReferrers().size() > 1 || n.hasKeys()) {
-                        connected.add(n);
+                    if (n.hasKeys()) {
+                        tagged.add(n);
+                    }
+                    for (OsmPrimitive r : n.getReferrers()) {
+                        if (r != w && r instanceof Way) {
+                            connectedWays.add((Way) r);
+                        }
                     }
                 }
                 ApplyAction action = new ApplyAction(session);
                 assertTrue(action.apply(c) != null);
                 action.getAppliedGroup().forEach(m -> m.setStatus(Candidate.Status.UEBERNOMMEN));
                 replaced++;
-                for (org.openstreetmap.josm.data.osm.Node n : connected) {
-                    assertTrue(w.getNodes().contains(n), c.getTitle() + ": Verbindung über Knoten " + n.getUniqueId() + " verloren");
+                for (org.openstreetmap.josm.data.osm.Node n : tagged) {
+                    assertTrue(w.getNodes().contains(n), c.getTitle() + ": Knoten mit Tags " + n.getUniqueId() + " verloren");
                 }
-                assertNoOverlap(crs, ds, w, c.getTitle());
+                java.util.Map<OsmPrimitive, Candidate> group = new java.util.IdentityHashMap<>();
+                action.getAppliedGroup().forEach(m -> group.put(m.getMatch().getPartner().getPrimitive(), m));
+                for (Way r : connectedWays) {
+                    if (!r.isUsable()) {
+                        continue;
+                    }
+                    boolean shares = r.getNodes().stream().anyMatch(w.getNodes()::contains);
+                    Candidate m = group.get(r);
+                    if (m == null) {
+                        // Nachbar außerhalb der Gruppe: Verbindung bleibt erhalten
+                        assertTrue(shares, c.getTitle() + ": Verbindung zu Weg " + r.getUniqueId() + " verloren");
+                    } else if (m != c && c.getGeometry().distance(m.getGeometry()) <= 0.01) {
+                        // gemeinsam angeglichen: verbunden, wo sich die ALKIS-Umrisse berühren
+                        assertTrue(shares, c.getTitle() + ": in ALKIS angrenzendes " + m.getTitle() + " nicht verbunden");
+                    }
+                }
+                // Gebäude, die jetzt auf ALKIS liegen: Abstände zwischen ihnen stammen aus ALKIS
+                replacedWays.addAll(group.keySet().stream().map(Way.class::cast).collect(java.util.stream.Collectors.toList()));
+                java.util.Set<Way> onAlkis = replacedWays;
+                assertNoOverlap(crs, ds, w, c.getTitle(), onAlkis);
                 continue;
             }
             if (c.getMatchClass() != MatchClass.NEU || c.getFit() == null || !c.getFit().isModified()) {
@@ -146,7 +173,10 @@ class RealOsmNeighbourOnlineTest {
             applied++;
             OsmPrimitive p = ds.getSelected().iterator().next();
             if (p instanceof Way) {
-                assertNoOverlap(crs, ds, (Way) p, c.getTitle());
+                // neues Gebäude in ALKIS-Lage: Abstände zu bereits angeglichenen Nachbarn gibt ALKIS vor
+                java.util.Set<Way> onAlkis = new java.util.HashSet<>(replacedWays);
+                onAlkis.add((Way) p);
+                assertNoOverlap(crs, ds, (Way) p, c.getTitle(), onAlkis);
             }
         }
         System.out.println("Abweichend ersetzt: " + replaced + ", Konflikte (nicht ersetzt): " + replaceConflicts);
@@ -158,11 +188,16 @@ class RealOsmNeighbourOnlineTest {
         assertEquals(adjacent - conflicts, applied);
     }
 
-    /** Kein Knoten eines Nachbargebäudes darf knapp neben einer Kante von {@code w} liegen, ohne verbunden zu sein. */
-    private static int assertNoDanglingNeighbourNodes(CrsTransformer crs, DataSet ds, Way w, String title) {
+    /**
+     * Kein Knoten eines Nachbargebäudes darf knapp neben einer Kante von {@code w} liegen, ohne verbunden zu
+     * sein. Ausgenommen sind Nachbarn, die wie {@code w} auf ALKIS liegen: Dort gibt ALKIS den Abstand vor.
+     */
+    private static int assertNoDanglingNeighbourNodes(CrsTransformer crs, DataSet ds, Way w, String title,
+            java.util.Set<Way> onAlkis) {
         int checked = 0;
         for (Way other : ds.searchWays(w.getBBox())) {
-            if (other == w || !other.isUsable() || !OsmMatcher.isBuilding(other)) {
+            if (other == w || !other.isUsable() || !OsmMatcher.isBuilding(other)
+                    || (onAlkis.contains(w) && onAlkis.contains(other))) {
                 continue;
             }
             for (org.openstreetmap.josm.data.osm.Node n : other.getNodes()) {
@@ -189,8 +224,8 @@ class RealOsmNeighbourOnlineTest {
         return checked;
     }
 
-    private static void assertNoOverlap(CrsTransformer crs, DataSet ds, Way w, String title) {
-        assertNoDanglingNeighbourNodes(crs, ds, w, title);
+    private static void assertNoOverlap(CrsTransformer crs, DataSet ds, Way w, String title, java.util.Set<Way> onAlkis) {
+        assertNoDanglingNeighbourNodes(crs, ds, w, title, onAlkis);
         Geometry g = polygon(crs, w);
         for (Way other : ds.searchWays(w.getBBox())) {
             if (other != w && other.isUsable() && other.isClosed() && OsmMatcher.isBuilding(other)) {

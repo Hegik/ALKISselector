@@ -24,6 +24,7 @@ import de.alkisselector.config.AlkisSettings;
 import de.alkisselector.config.ServiceProfile;
 import de.alkisselector.decision.AnalysisSession;
 import de.alkisselector.decision.CandidateAnalyzer;
+import de.alkisselector.decision.LoadedArea;
 import de.alkisselector.decision.OsmSnapshot;
 import de.alkisselector.source.AlkisBuilding;
 import de.alkisselector.source.CrsTransformer;
@@ -42,6 +43,8 @@ public class AnalysisTask extends PleaseWaitRunnable {
     private final Bounds bounds;
     private final LatLon clickPoint;
     private final DataSet dataSet;
+    /** Heruntergeladene OSM-Bereiche, beim Start im EDT kopiert. */
+    private final List<Bounds> loadedBounds;
 
     private AnalysisSession session;
     private String error;
@@ -60,6 +63,7 @@ public class AnalysisTask extends PleaseWaitRunnable {
         this.bounds = bounds;
         this.clickPoint = null;
         this.dataSet = dataSet;
+        this.loadedBounds = new ArrayList<>(dataSet.getDataSourceBounds());
     }
 
     /**
@@ -74,6 +78,7 @@ public class AnalysisTask extends PleaseWaitRunnable {
         this.bounds = null;
         this.clickPoint = clickPoint;
         this.dataSet = dataSet;
+        this.loadedBounds = new ArrayList<>(dataSet.getDataSourceBounds());
     }
 
     @Override
@@ -142,7 +147,12 @@ public class AnalysisTask extends PleaseWaitRunnable {
         AnalysisSession s = new AnalysisSession(profile, crs, dataSet);
         s.setTruncated(wfs.isTruncated());
         new CandidateAnalyzer(profile, crs, CandidateAnalyzer.Params.fromSettings())
-                .analyze(s, buildings, osm, area, progressMonitor);
+                .analyze(s, buildings, osm, area, LoadedArea.of(loadedBounds, crs), progressMonitor);
+        if (clickPoint != null && s.getCandidates().isEmpty() && s.getOutsideCount() > 0) {
+            info = "Das Gebäude liegt nicht vollständig im heruntergeladenen OSM-Bereich und wird nicht übernommen. "
+                    + "Bitte den Bereich um das Gebäude herunterladen.";
+            return;
+        }
         if (clickPoint != null && s.getCandidates().isEmpty()) {
             info = "Das ALKIS-Objekt an dieser Stelle ist kein eigenständiges Gebäude (z. B. Bauteil oder unterirdisch).";
             return;

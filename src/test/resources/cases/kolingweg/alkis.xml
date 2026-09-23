@@ -1,0 +1,2066 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wfs:FeatureCollection timeStamp="2026-09-23T17:48:14.610+02:00" numberReturned="85" numberMatched="unknown" xmlns="http://repository.gdi-de.org/schemas/adv/produkt/alkis-vereinfacht/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://repository.gdi-de.org/schemas/adv/produkt/alkis-vereinfacht/2.0 http://www.wfs.nrw.de/aaa-suite/schema/AAA-vereinfacht/2.0/schema/ALKIS-vereinfacht.xsd http://www.opengis.net/wfs/2.0 http://www.wfs.nrw.de/aaa-suite/schema/ogc/wfs/2.0/wfs.xsd http://www.opengis.net/gml/3.2 http://www.wfs.nrw.de/aaa-suite/schema/NAS/6.0.1/schema/gml/3.2.1/gml.xsd http://www.isotc211.org/2005/gco http://www.wfs.nrw.de/aaa-suite/schema/NAS/6.0.1/schema/iso/19139/20070417/gco/gco.xsd http://www.isotc211.org/2005/gmd http://www.wfs.nrw.de/aaa-suite/schema/NAS/6.0.1/schema/iso/19139/20070417/gmd/gmd.xsd">
+<wfs:boundedBy>
+<gml:Envelope srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:lowerCorner>383269.345 5770984.136</gml:lowerCorner>
+<gml:upperCorner>383505.23 5771231.492</gml:upperCorner>
+</gml:Envelope>
+</wfs:boundedBy>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hDBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hDBL</gml:identifier>
+<oid>DENW53AL000028hDBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286388713.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286388713.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383281.75 5771045.043 383281.573 5771044.853 383286.29 5771040.461 383286.475 5771040.658 383281.75 5771045.043</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vSBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vSBL</gml:identifier>
+<oid>DENW53AL000028vSBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286388740.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286388740.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383390.833 5771151.027 383389.261 5771148.647 383388.946 5771148.854 383388.083 5771147.626 383391.731 5771145.093 383394.219 5771148.837 383394.186 5771148.858 383392.741 5771149.793 383392.637 5771149.637 383391.772 5771150.209 383391.867 5771150.358 383390.833 5771151.027</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vgBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vgBL</gml:identifier>
+<oid>DENW53AL000028vgBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286388741.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286388741.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383351.568 5771160.599 383352.926 5771159.477 383354.617 5771161.469 383353.278 5771162.609 383351.568 5771160.599</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vhBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vhBL</gml:identifier>
+<oid>DENW53AL000028vhBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286388742.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286388742.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383340.281 5771163.157 383338.993 5771161.621 383342.811 5771158.385 383344.109 5771159.924 383340.281 5771163.157</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wcBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wcBL</gml:identifier>
+<oid>DENW53AL000028wcBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286388746.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286388746.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383397.865 5771167.35 383398.724 5771166.834 383401.326 5771171.238 383400.457 5771171.755 383397.865 5771167.35</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002uO5HBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002uO5HBL</gml:identifier>
+<oid>DENW53AL0002uO5HBL</oid>
+<aktualit>2024-07-18Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399337.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399337.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383290.341 5771044.777 383286.475 5771040.658 383293.132 5771038.091 383295.161 5771040.251 383290.341 5771044.777</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDfXBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDfXBL</gml:identifier>
+<oid>DENW53AL0002vDfXBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399837.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399837.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383432.233 5771195.963 383430.168 5771194.077 383433.74 5771190.166 383435.805 5771192.052 383432.233 5771195.963</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDfYBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDfYBL</gml:identifier>
+<oid>DENW53AL0002vDfYBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399838.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399838.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383398.724 5771166.834 383398.605 5771166.629 383399.904 5771165.844 383399.174 5771164.631 383401.292 5771163.379 383405.006 5771169.665 383401.589 5771171.684 383401.326 5771171.238 383398.724 5771166.834</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDfZBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDfZBL</gml:identifier>
+<oid>DENW53AL0002vDfZBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399839.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399839.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383385.243 5771138.064 383388.256 5771137.442 383390.833 5771140.095 383388.796 5771141.722 383385.243 5771138.064</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg0BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg0BL</gml:identifier>
+<oid>DENW53AL0002vDg0BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399840.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399840.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383377.086 5771135.995 383378.885 5771134.25 383379.533 5771133.627 383380.575 5771134.71 383381.791 5771134.481 383382.939 5771135.674 383382.832 5771137.058 383383.894 5771138.162 383381.444 5771140.527 383377.086 5771135.995</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg2BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg2BL</gml:identifier>
+<oid>DENW53AL0002vDg2BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399841.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399841.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383367.008 5771121.296 383368.927 5771119.564 383373.711 5771124.862 383371.788 5771126.59 383367.008 5771121.296</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg5BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg5BL</gml:identifier>
+<oid>DENW53AL0002vDg5BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399842.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399842.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383349.549 5771109.264 383344.479 5771103.952 383347.136 5771101.417 383352.205 5771106.728 383350.675 5771108.187 383349.549 5771109.264</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg6BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg6BL</gml:identifier>
+<oid>DENW53AL0002vDg6BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399843.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399843.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383377.239 5771221.473 383375.727 5771218.813 383376.666 5771218.279 383378.841 5771217.043 383380.362 5771219.738 383378.403 5771220.811 383377.239 5771221.473</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg9BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg9BL</gml:identifier>
+<oid>DENW53AL0002vDg9BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399844.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399844.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383385.068 5771206.59 383383.815 5771204.36 383387.995 5771202.011 383389.248 5771204.24 383385.068 5771206.59</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Carport</funktion>
+<gfkzshh>51009_1611</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDgaBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDgaBL</gml:identifier>
+<oid>DENW53AL0002vDgaBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399965.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399965.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383355.466 5771179.94 383353.514 5771177.624 383356.982 5771174.701 383362.78 5771181.579 383361.686 5771182.503 383359.783 5771180.246 383358.583 5771181.257 383356.639 5771178.951 383355.466 5771179.94</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDgbBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDgbBL</gml:identifier>
+<oid>DENW53AL0002vDgbBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399966.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399966.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383341.026 5771172.674 383343.749 5771170.345 383347.822 5771175.107 383345.099 5771177.436 383341.026 5771172.674</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDgdBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDgdBL</gml:identifier>
+<oid>DENW53AL0002vDgdBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399967.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399967.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383307.343 5771224.309 383303.922 5771223.042 383306.055 5771217.284 383309.476 5771218.551 383307.343 5771224.309</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Carport</funktion>
+<gfkzshh>51009_1611</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDgeBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDgeBL</gml:identifier>
+<oid>DENW53AL0002vDgeBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399968.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399968.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383298.573 5771221.103 383298.258 5771221.973 383295.236 5771220.878 383297.668 5771214.165 383300.69 5771215.26 383298.573 5771221.103</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Carport</funktion>
+<gfkzshh>51009_1611</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDgfBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDgfBL</gml:identifier>
+<oid>DENW53AL0002vDgfBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286399969.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286399969.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383286.238 5771216.448 383287.884 5771211.953 383294.293 5771214.3 383292.643 5771218.805 383286.238 5771216.448</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Sonstiges Bauwerk oder sonstige Einrichtung</gebnutzbez>
+<funktion>Überdachung</funktion>
+<gfkzshh>51009_1610</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hABL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hABL</gml:identifier>
+<oid>DENW53AL000028hABL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523068.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523068.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383278.744 5770985.476 383284.593 5770984.136 383285.503 5770988.068 383279.637 5770989.402 383278.744 5770985.476</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hBBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hBBL</gml:identifier>
+<oid>DENW53AL000028hBBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523069.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523069.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383282.002 5770998.02 383287.727 5770996.718 383289.219 5771003.3 383283.492 5771004.588 383282.002 5770998.02</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hCBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hCBL</gml:identifier>
+<oid>DENW53AL000028hCBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523070.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523070.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383286.475 5771040.658 383291.265 5771045.759 383286.508 5771050.165 383281.75 5771045.043 383286.475 5771040.658</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hEBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hEBL</gml:identifier>
+<oid>DENW53AL000028hEBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523071.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523071.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383296.777 5771042.65 383300.897 5771047.079 383302.008 5771046.071 383304.748 5771048.991 383303.65 5771050.01 383304.341 5771050.754 383297.304 5771057.325 383289.733 5771049.226 383296.777 5771042.65</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 19</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hFBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hFBL</gml:identifier>
+<oid>DENW53AL000028hFBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523072.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523072.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383297.999 5771068.928 383303.413 5771063.703 383304.938 5771065.229 383306.287 5771063.925 383311.873 5771069.666 383307.626 5771073.736 383307.538 5771073.653 383304.993 5771076.075 383304.813 5771075.892 383302.39 5771075.839 383302.412 5771073.46 383297.999 5771068.928</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 17</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hGBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hGBL</gml:identifier>
+<oid>DENW53AL000028hGBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523073.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523073.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383308.281 5771061.661 383304.262 5771057.266 383310.331 5771051.735 383314.391 5771056.171 383308.281 5771061.661</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hHBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hHBL</gml:identifier>
+<oid>DENW53AL000028hHBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523074.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523074.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383311.325 5771016.476 383315.058 5771020.39 383312.451 5771022.878 383308.728 5771018.991 383311.325 5771016.476</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hIBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hIBL</gml:identifier>
+<oid>DENW53AL000028hIBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523075.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523075.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383308.333 5771080.438 383314.28 5771075.002 383315.731 5771076.583 383320.477 5771072.234 383324.209 5771076.328 383325.248 5771075.397 383328.365 5771078.847 383325.199 5771081.771 383325.409 5771082.016 383324.542 5771082.803 383324.5 5771082.763 383321.307 5771085.645 383318.734 5771082.852 383314.263 5771086.944 383312.808 5771086.895 383311.805 5771085.804 383311.851 5771084.441 383310.63 5771083.092 383309.253 5771083 383308.278 5771081.93 383308.333 5771080.438</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 15</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hJBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hJBL</gml:identifier>
+<oid>DENW53AL000028hJBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523076.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523076.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383332.206 5771093.027 383334.358 5771095.314 383337.449 5771092.335 383339.306 5771094.348 383339.528 5771094.145 383341.62 5771096.394 383338.271 5771099.52 383338.353 5771099.607 383332.493 5771105.162 383326.282 5771098.607 383332.206 5771093.027</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 13</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hKBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hKBL</gml:identifier>
+<oid>DENW53AL000028hKBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523077.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523077.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383337.628 5771076.819 383331.081 5771082.769 383328.896 5771080.324 383335.444 5771074.401 383337.628 5771076.819</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hLBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hLBL</gml:identifier>
+<oid>DENW53AL000028hLBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523078.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523078.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383343.137 5771076.073 383352.679 5771086.284 383345.358 5771093.131 383335.803 5771082.905 383343.137 5771076.073</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028hzBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028hzBL</gml:identifier>
+<oid>DENW53AL000028hzBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523088.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523088.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383269.345 5770991.214 383277.108 5770989.456 383279.367 5770999.928 383271.636 5771001.681 383269.345 5770991.214</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 23</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028uABL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028uABL</gml:identifier>
+<oid>DENW53AL000028uABL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523633.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523633.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383301.322 5771213.516 383306.371 5771215.348 383303.623 5771222.931 383298.573 5771221.103 383301.322 5771213.516</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028utBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028utBL</gml:identifier>
+<oid>DENW53AL000028utBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523721.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523721.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383280.967 5771228.372 383285.441 5771216.154 383293.924 5771219.276 383289.435 5771231.492 383285.472 5771230.033 383280.967 5771228.372</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Dahlienweg 4</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028v4BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028v4BL</gml:identifier>
+<oid>DENW53AL000028v4BL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523731.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523731.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383329.938 5771197.073 383332.63 5771194.649 383334.468 5771196.764 383331.764 5771199.148 383329.938 5771197.073</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vBBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vBBL</gml:identifier>
+<oid>DENW53AL000028vBBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523737.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523737.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383362.78 5771181.579 383356.378 5771173.983 383359.046 5771171.691 383358.824 5771171.433 383359.367 5771170.094 383360.164 5771169.409 383361.578 5771169.04 383361.813 5771169.313 383364.656 5771166.87 383371.679 5771175.198 383366.422 5771179.714 383363.397 5771182.311 383362.78 5771181.579</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 8</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vDBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vDBL</gml:identifier>
+<oid>DENW53AL000028vDBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523739.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523739.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383380.18 5771142.14 383374.444 5771147.652 383364.763 5771137.518 383373.775 5771128.939 383378.885 5771134.25 383377.086 5771135.995 383381.444 5771140.527 383381.642 5771140.729 383380.18 5771142.14</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 7</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vGBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vGBL</gml:identifier>
+<oid>DENW53AL000028vGBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523742.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523742.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383375.865 5771199.07 383376.088 5771199.406 383380.037 5771196.747 383382.761 5771200.888 383375.263 5771205.847 383372.335 5771201.407 383375.865 5771199.07</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vHBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vHBL</gml:identifier>
+<oid>DENW53AL000028vHBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523743.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523743.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383380.362 5771219.738 383378.841 5771217.043 383376.666 5771218.279 383372.709 5771211.173 383377.785 5771208.304 383377.573 5771207.928 383381.014 5771205.984 383382.245 5771208.176 383379.556 5771209.687 383384.025 5771217.625 383384.241 5771218.007 383380.559 5771220.088 383380.362 5771219.738</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 4 a</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vKBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vKBL</gml:identifier>
+<oid>DENW53AL000028vKBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523746.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523746.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383375.865 5771199.07 383370.796 5771191.434 383379.146 5771185.901 383384.399 5771193.811 383380.037 5771196.747 383376.088 5771199.406 383375.865 5771199.07</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 6</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vOBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vOBL</gml:identifier>
+<oid>DENW53AL000028vOBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523749.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523749.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383380.18 5771142.14 383381.642 5771140.729 383381.444 5771140.527 383384.639 5771137.442 383388.796 5771141.722 383383.755 5771145.874 383380.18 5771142.14</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vPBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vPBL</gml:identifier>
+<oid>DENW53AL000028vPBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523750.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523750.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383380.362 5771219.738 383380.559 5771220.088 383384.241 5771218.007 383388.788 5771215.436 383391.144 5771219.68 383381.003 5771225.386 383378.403 5771220.811 383380.362 5771219.738</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vRBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vRBL</gml:identifier>
+<oid>DENW53AL000028vRBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523802.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523802.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383380.075 5771154.682 383388.946 5771148.854 383389.261 5771148.647 383390.833 5771151.027 383391.867 5771150.358 383391.772 5771150.209 383392.637 5771149.637 383392.741 5771149.793 383394.186 5771148.858 383395.815 5771151.261 383395.952 5771151.16 383396.496 5771151.99 383396.357 5771152.086 383397.958 5771154.519 383396.521 5771155.458 383396.63 5771155.584 383395.752 5771156.174 383395.644 5771156.031 383394.592 5771156.72 383395.46 5771158.034 383386.305 5771164.089 383380.075 5771154.682</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 5</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vUBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vUBL</gml:identifier>
+<oid>DENW53AL000028vUBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523803.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523803.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383385.81 5771144.241 383390.833 5771140.095 383393.453 5771143.898 383391.731 5771145.093 383388.083 5771147.626 383385.81 5771144.241</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vWBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vWBL</gml:identifier>
+<oid>DENW53AL000028vWBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523805.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523805.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383382.245 5771208.176 383389.248 5771204.24 383393.932 5771212.53 383388.788 5771215.436 383384.241 5771218.007 383384.025 5771217.625 383379.556 5771209.687 383382.245 5771208.176</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 4</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vaBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vaBL</gml:identifier>
+<oid>DENW53AL000028vaBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523808.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523808.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383344.479 5771103.952 383349.549 5771109.264 383350.675 5771108.187 383353.914 5771111.544 383345.862 5771119.153 383337.594 5771110.481 383344.479 5771103.952</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 11</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vcBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vcBL</gml:identifier>
+<oid>DENW53AL000028vcBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523810.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523810.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383345.266 5771169.037 383345.447 5771169.251 383350.77 5771164.733 383354.654 5771169.28 383347.822 5771175.107 383343.749 5771170.345 383345.266 5771169.037</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vfBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vfBL</gml:identifier>
+<oid>DENW53AL000028vfBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523813.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523813.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383345.266 5771169.037 383342.966 5771166.318 383341.888 5771167.225 383340.551 5771167.113 383339.247 5771165.594 383339.361 5771164.282 383340.451 5771163.355 383340.281 5771163.157 383344.109 5771159.924 383342.811 5771158.385 383348.146 5771153.854 383352.926 5771159.477 383351.568 5771160.599 383353.278 5771162.609 383350.77 5771164.733 383345.447 5771169.251 383345.266 5771169.037</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 10</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vmBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vmBL</gml:identifier>
+<oid>DENW53AL000028vmBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523817.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523817.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383362.753 5771125.585 383357.438 5771130.409 383350.651 5771122.976 383358.125 5771116.172 383364.741 5771123.331 383364.961 5771123.572 383362.753 5771125.585</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 9</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vyBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vyBL</gml:identifier>
+<oid>DENW53AL000028vyBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523825.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523825.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383361.686 5771182.503 383362.78 5771181.579 383363.397 5771182.311 383366.422 5771179.714 383369.411 5771183.205 383365.287 5771186.754 383362.944 5771188.77 383359.315 5771184.506 383361.686 5771182.503</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028vzBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028vzBL</gml:identifier>
+<oid>DENW53AL000028vzBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523826.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523826.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383362.753 5771125.585 383364.961 5771123.572 383364.741 5771123.331 383367.008 5771121.296 383371.788 5771126.59 383367.353 5771130.657 383362.753 5771125.585</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wCBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wCBL</gml:identifier>
+<oid>DENW53AL000028wCBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523838.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523838.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383456.749 5771187.813 383462.547 5771181.158 383467.811 5771185.762 383466.693 5771187.049 383471.415 5771191.134 383469.391 5771193.48 383469.598 5771193.661 383469.101 5771194.232 383468.904 5771194.051 383466.86 5771196.417 383462.128 5771192.312 383462.052 5771192.405 383456.749 5771187.813</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Spinnbahn 24</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wEBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wEBL</gml:identifier>
+<oid>DENW53AL000028wEBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523840.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523840.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383463.924 5771144.47 383465.934 5771142.322 383471.108 5771147.078 383468.534 5771149.864 383463.354 5771145.079 383463.924 5771144.47</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wFBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wFBL</gml:identifier>
+<oid>DENW53AL000028wFBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523841.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523841.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383473.642 5771179.916 383476.367 5771181.203 383475.511 5771183.01 383472.798 5771181.762 383473.642 5771179.916</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wGBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wGBL</gml:identifier>
+<oid>DENW53AL000028wGBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523842.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523842.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383477.031 5771182.256 383480.82 5771184.119 383479.309 5771187.254 383475.489 5771185.382 383477.031 5771182.256</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wJBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wJBL</gml:identifier>
+<oid>DENW53AL000028wJBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523844.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523844.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383484.48 5771173.773 383485.814 5771174.988 383481.396 5771179.83 383472.021 5771171.266 383481.154 5771161.27 383484.847 5771164.672 383490.364 5771169.755 383490.495 5771169.875 383490.232 5771170.156 383488.893 5771168.93 383484.48 5771173.773</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Spinnbahn 22</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wKBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wKBL</gml:identifier>
+<oid>DENW53AL000028wKBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523845.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523845.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383484.847 5771164.672 383489.167 5771159.963 383489.423 5771160.197 383494.24 5771164.595 383494.728 5771165.04 383490.364 5771169.755 383484.847 5771164.672</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wLBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wLBL</gml:identifier>
+<oid>DENW53AL000028wLBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523846.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523846.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383493.312 5771155.996 383489.171 5771152.176 383497.471 5771143.167 383505.23 5771150.268 383497.152 5771159.088 383496.932 5771159.327 383493.312 5771155.996</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Spinnbahn 20</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wMBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wMBL</gml:identifier>
+<oid>DENW53AL000028wMBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523847.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523847.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383489.423 5771160.197 383493.312 5771155.996 383496.932 5771159.327 383497.152 5771159.088 383498.348 5771160.189 383494.24 5771164.595 383489.423 5771160.197</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wbBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wbBL</gml:identifier>
+<oid>DENW53AL000028wbBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523849.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523849.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383394.119 5771168.967 383397.68 5771166.963 383397.865 5771167.35 383400.457 5771171.755 383401.326 5771171.238 383404.436 5771176.522 383403.61 5771177.012 383399.377 5771179.526 383394.903 5771182.182 383391.053 5771175.668 383391.434 5771175.442 383389.274 5771171.82 383394.119 5771168.967</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 3</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wfBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wfBL</gml:identifier>
+<oid>DENW53AL000028wfBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523902.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523902.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383402.104 5771199.833 383395.919 5771188.623 383404.344 5771184.01 383405.338 5771185.8 383410.516 5771195.14 383410.427 5771195.184 383410.481 5771195.272 383402.104 5771199.833</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 1 a</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wgBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wgBL</gml:identifier>
+<oid>DENW53AL000028wgBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523903.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523903.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383399.377 5771179.526 383403.61 5771177.012 383405.273 5771179.837 383401.033 5771182.337 383399.377 5771179.526</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wjBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wjBL</gml:identifier>
+<oid>DENW53AL000028wjBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523906.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523906.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383404.344 5771184.01 383406.868 5771182.635 383407.883 5771184.423 383405.338 5771185.8 383404.344 5771184.01</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wkBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wkBL</gml:identifier>
+<oid>DENW53AL000028wkBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523907.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523907.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383402.104 5771199.833 383410.481 5771195.272 383415.879 5771205.093 383407.532 5771209.653 383402.104 5771199.833</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 1</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wqBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wqBL</gml:identifier>
+<oid>DENW53AL000028wqBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523913.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523913.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383434.321 5771174.088 383437.553 5771170.471 383439.049 5771171.81 383443.889 5771166.426 383450.572 5771172.451 383442.22 5771181.734 383435.538 5771175.698 383435.796 5771175.417 383434.321 5771174.088</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Spinnbahn 3</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wxBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wxBL</gml:identifier>
+<oid>DENW53AL000028wxBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523920.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523920.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383452.965 5771154.876 383454.804 5771156.581 383454.196 5771157.252 383458.251 5771160.998 383457.283 5771162.047 383455.697 5771163.762 383449.813 5771158.259 383451.29 5771156.674 383452.965 5771154.876</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wyBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wyBL</gml:identifier>
+<oid>DENW53AL000028wyBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523921.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523921.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383452.965 5771154.876 383449.301 5771151.481 383456.669 5771143.527 383459.019 5771140.991 383461.227 5771143.029 383461.751 5771142.466 383463.924 5771144.47 383463.354 5771145.079 383468.534 5771149.864 383465.784 5771152.842 383464.677 5771151.82 383459.834 5771157.078 383460.934 5771158.094 383458.251 5771160.998 383454.196 5771157.252 383454.804 5771156.581 383452.965 5771154.876</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Spinnbahn 9</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL000028wzBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL000028wzBL</gml:identifier>
+<oid>DENW53AL000028wzBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286523922.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286523922.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383456.669 5771143.527 383459.019 5771140.991 383461.227 5771143.029 383458.867 5771145.564 383456.669 5771143.527</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Auskragender Geschossteil</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0000OY5jBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0000OY5jBL</gml:identifier>
+<oid>DENW53AL0000OY5jBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286529466.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286529466.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383394.119 5771168.967 383391.434 5771164.486 383397.068 5771161.129 383399.904 5771165.844 383398.605 5771166.629 383398.724 5771166.834 383397.865 5771167.35 383397.68 5771166.963 383394.119 5771168.967</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002mJV8BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002mJV8BL</gml:identifier>
+<oid>DENW53AL0002mJV8BL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532203.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532203.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383448.591 5771212.048 383452.527 5771201.139 383461.086 5771204.208 383457.155 5771215.126 383448.591 5771212.048</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Spinnbahn 26</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002mNaGBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002mNaGBL</gml:identifier>
+<oid>DENW53AL0002mNaGBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532221.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532221.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383361.686 5771182.503 383362.78 5771181.579 383363.397 5771182.311 383366.422 5771179.714 383369.411 5771183.205 383365.287 5771186.754 383361.686 5771182.503</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Sonstiges</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002mNaIBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002mNaIBL</gml:identifier>
+<oid>DENW53AL0002mNaIBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532223.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532223.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383484.48 5771173.773 383483.421 5771172.808 383487.844 5771167.969 383488.893 5771168.93 383484.48 5771173.773</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Sonstiges</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002n1vkBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002n1vkBL</gml:identifier>
+<oid>DENW53AL0002n1vkBL</oid>
+<aktualit>2023-10-24Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532544.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532544.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383380.075 5771154.682 383388.946 5771148.854 383389.261 5771148.647 383390.833 5771151.027 383394.592 5771156.72 383395.46 5771158.034 383386.305 5771164.089 383380.075 5771154.682</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Sonstiges</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002sP73BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002sP73BL</gml:identifier>
+<oid>DENW53AL0002sP73BL</oid>
+<aktualit>2024-04-04Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532799.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532799.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383286.14 5771017.421 383292.14 5771011.825 383296.584 5771016.572 383291.899 5771020.936 383298.207 5771027.698 383296.847 5771028.963 383286.14 5771017.421</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Sonstiges</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002sP75BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002sP75BL</gml:identifier>
+<oid>DENW53AL0002sP75BL</oid>
+<aktualit>2024-04-04Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532800.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532800.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383285.755 5771032.453 383287.21 5771031.096 383290.62 5771034.775 383289.375 5771035.94 383289.141 5771036.152 383285.755 5771032.453</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Sonstiges</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002sP76BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002sP76BL</gml:identifier>
+<oid>DENW53AL0002sP76BL</oid>
+<aktualit>2024-04-04Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532851.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532851.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383279.911 5771023.238 383284.676 5771028.361 383282.499 5771030.424 383277.714 5771025.285 383279.911 5771023.238</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Sonstiges</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002sP78BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002sP78BL</gml:identifier>
+<oid>DENW53AL0002sP78BL</oid>
+<aktualit>2024-04-04Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532852.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532852.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383285.755 5771032.453 383289.141 5771036.152 383289.375 5771035.94 383291.63 5771038.326 383286.366 5771040.358 383284.202 5771042.39 383279.958 5771037.843 383285.755 5771032.453</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002sP7aBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002sP7aBL</gml:identifier>
+<oid>DENW53AL0002sP7aBL</oid>
+<aktualit>2024-04-04Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286532853.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286532853.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383279.911 5771023.238 383286.14 5771017.421 383292.14 5771011.825 383296.584 5771016.572 383291.899 5771020.936 383298.207 5771027.698 383296.847 5771028.963 383290.62 5771034.775 383289.375 5771035.94 383289.141 5771036.152 383285.755 5771032.453 383287.21 5771031.096 383284.676 5771028.361 383282.499 5771030.424 383277.714 5771025.285 383279.911 5771023.238</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gemischt genutztes Gebäude mit Wohnen</funktion>
+<gfkzshh>31001_1100</gfkzshh>
+<gmdschl>05566024</gmdschl>
+<lagebeztxt>Kolingweg 21</lagebeztxt>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002uO5FBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002uO5FBL</gml:identifier>
+<oid>DENW53AL0002uO5FBL</oid>
+<aktualit>2024-07-18Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533007.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533007.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383320.477 5771072.234 383324.3 5771068.75 383328.04 5771072.853 383325.248 5771075.397 383324.209 5771076.328 383320.477 5771072.234</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Bauteil</gebnutzbez>
+<funktion>Sonstiges</funktion>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002uO5GBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002uO5GBL</gml:identifier>
+<oid>DENW53AL0002uO5GBL</oid>
+<aktualit>2024-07-18Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533008.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533008.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383320.477 5771072.234 383324.3 5771068.75 383328.04 5771072.853 383325.248 5771075.397 383324.209 5771076.328 383320.477 5771072.234</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Wohngebäude</funktion>
+<gfkzshh>31001_1000</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDfVBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDfVBL</gml:identifier>
+<oid>DENW53AL0002vDfVBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533210.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533210.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383463.36 5771200.568 383458.912 5771196.611 383460.634 5771194.675 383465.082 5771198.633 383463.36 5771200.568</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDfWBL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDfWBL</gml:identifier>
+<oid>DENW53AL0002vDfWBL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533211.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533211.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383488.004 5771195.026 383490.751 5771192.077 383493.24 5771194.395 383490.493 5771197.344 383488.004 5771195.026</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg1BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg1BL</gml:identifier>
+<oid>DENW53AL0002vDg1BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533212.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533212.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383371.286 5771120.424 383374.577 5771117.409 383377 5771120.054 383373.709 5771123.069 383371.286 5771120.424</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg3BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg3BL</gml:identifier>
+<oid>DENW53AL0002vDg3BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533213.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533213.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383348.071 5771094.506 383349.934 5771092.729 383352.94 5771095.88 383351.077 5771097.657 383348.071 5771094.506</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg4BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg4BL</gml:identifier>
+<oid>DENW53AL0002vDg4BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533214.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533214.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383348.071 5771094.506 383351.077 5771097.657 383347.136 5771101.417 383345.857 5771102.638 383342.85 5771099.487 383348.071 5771094.506</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zum Parken</funktion>
+<gfkzshh>31001_2460</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+<wfs:member>
+<GebaeudeBauwerk gml:id="DENW53AL0002vDg8BL">
+<gml:identifier codeSpace="urn:adv:oid:">urn:adv:oid:DENW53AL0002vDg8BL</gml:identifier>
+<oid>DENW53AL0002vDg8BL</oid>
+<aktualit>2024-09-09Z</aktualit>
+<geometrie>
+<gml:MultiSurface gml:id="gebbau.id.286533216.geometrie.Geom_0" srsName="urn:ogc:def:crs:EPSG::25832" srsDimension="2">
+<gml:surfaceMember>
+<gml:Polygon gml:id="gebbau.id.286533216.geometrie.Geom_1">
+<gml:exterior>
+<gml:LinearRing>
+<gml:posList>383345.721 5771208.575 383343.594 5771206.069 383349.445 5771201.103 383351.572 5771203.609 383345.721 5771208.575</gml:posList>
+</gml:LinearRing>
+</gml:exterior>
+</gml:Polygon>
+</gml:surfaceMember>
+</gml:MultiSurface>
+</geometrie>
+<gebnutzbez>Gebäude</gebnutzbez>
+<funktion>Gebäude zur Freizeitgestaltung</funktion>
+<gfkzshh>31001_1310</gfkzshh>
+<gmdschl>05566024</gmdschl>
+</GebaeudeBauwerk>
+</wfs:member>
+</wfs:FeatureCollection>

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.openstreetmap.josm.command.AddCommand;
 import org.openstreetmap.josm.command.ChangeNodesCommand;
 import org.openstreetmap.josm.command.ChangePropertyCommand;
@@ -30,6 +31,7 @@ import org.openstreetmap.josm.data.osm.RelationMember;
 import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.gui.MainApplication;
 
+import de.alkisselector.compare.GeometryComparator;
 import de.alkisselector.compare.MatchClass;
 import de.alkisselector.compare.OsmBuilding;
 import de.alkisselector.config.AlkisSettings;
@@ -330,11 +332,14 @@ public final class ApplyAction {
                 corners.executeCommand();
                 executed.add(corners);
             }
+            Set<OsmPrimitive> ways = groupWays(group);
+            Set<OsmPrimitive> replaced = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
             for (Candidate m : group) {
                 // nacheinander: jedes weitere Gebäude sieht die bereits ersetzten Nachbarn
-                Command cmd = buildReplace(m, ds, selectedTags(m));
+                Command cmd = buildReplace(m, ds, selectedTags(m), ways, replaced);
                 cmd.executeCommand();
                 executed.add(cmd);
+                replaced.add(m.getMatch().getPartner().getPrimitive());
             }
             return executed;
         } catch (ApplyException | RuntimeException e) {
@@ -403,11 +408,23 @@ public final class ApplyAction {
                 }
             }
         }
-        if (targets.isEmpty()) {
+        // jede ALKIS-Ecke bekommt höchstens einen Knoten (den nächstgelegenen), sonst lägen zwei Knoten
+        // aufeinander und eine benachbarte Ecke ginge verloren
+        Map<String, Map.Entry<Node, double[]>> owner = new LinkedHashMap<>();
+        for (Map.Entry<Node, double[]> e : targets.entrySet()) {
+            String key = String.format(java.util.Locale.ROOT, "%.2f %.2f", e.getValue()[0], e.getValue()[1]);
+            Map.Entry<Node, double[]> other = owner.get(key);
+            if (other == null || distance(crs, e.getKey(), e.getValue()) < distance(crs, other.getKey(), other.getValue())) {
+                owner.put(key, e);
+            }
+        }
+        if (owner.isEmpty()) {
             return null;
         }
         List<Command> moves = new ArrayList<>();
-        targets.forEach((n, t) -> moves.add(new MoveCommand(n, crs.toLatLon(t[0], t[1]))));
+        for (Map.Entry<Node, double[]> e : owner.values()) {
+            moves.add(new MoveCommand(e.getKey(), crs.toLatLon(e.getValue()[0], e.getValue()[1])));
+        }
         return new SequenceCommand("Gemeinsame Ecken auf ALKIS setzen", moves);
     }
 
@@ -418,7 +435,8 @@ public final class ApplyAction {
      * eingebaut. Die übrigen alten Knoten werden verschoben und wiederverwendet, überzählige gelöscht.
      * Baut nur die Befehle, führt sie nicht aus.
      */
-    private Command buildReplace(Candidate c, DataSet ds, Map<String, String> tags) throws ApplyException {
+    private Command buildReplace(Candidate c, DataSet ds, Map<String, String> tags, Set<OsmPrimitive> group,
+            Set<OsmPrimitive> replaced) throws ApplyException {
         OsmBuilding partner = c.getMatch().getPartner();
         if (partner == null || !(partner.getPrimitive() instanceof Way)) {
             throw new ApplyException("Geometrie ersetzen ist nur für einfache OSM-Wege möglich.");
@@ -432,7 +450,7 @@ public final class ApplyAction {
         }
         CrsTransformer crs = session.getCrs();
         List<NeighbourFitter.KeepNode> keep = NeighbourWays.keepNodes(old, crs);
-        NeighbourFitter.Result fit = fitReplacement(c, session);
+        NeighbourFitter.Result fit = fitReplacement(c, session, group, replaced);
         if (fit.getPolygons().size() != 1 || fit.getPolygons().get(0).size() != 1
                 || fit.getPolygons().get(0).get(0).size() < 3) {
             throw new ApplyException("Die angepasste Geometrie besteht aus mehreren Teilen – bitte manuell bearbeiten.");
@@ -509,7 +527,36 @@ public final class ApplyAction {
                 usedPool.add(j);
             }
         }
+        uncross(result, targets);
         return result;
+    }
+
+    /**
+     * Tauscht die Ziele zweier Knoten, solange das die Summe der Wege verkürzt. Zwei sich kreuzende
+     * Verschiebungen lassen sich so immer auflösen (die getauschten Wege sind zusammen kürzer), die
+     * Pfeile der Vorschau kreuzen sich danach nicht mehr.
+     */
+    private static void uncross(Map<Integer, Node> result, List<LatLon> targets) {
+        List<Integer> idx = new ArrayList<>(result.keySet());
+        boolean improved = true;
+        for (int round = 0; improved && round < 100; round++) {
+            improved = false;
+            for (int a = 0; a < idx.size(); a++) {
+                for (int b = a + 1; b < idx.size(); b++) {
+                    int i = idx.get(a);
+                    int k = idx.get(b);
+                    Node ni = result.get(i);
+                    Node nk = result.get(k);
+                    double now = ni.greatCircleDistance(targets.get(i)) + nk.greatCircleDistance(targets.get(k));
+                    double swapped = ni.greatCircleDistance(targets.get(k)) + nk.greatCircleDistance(targets.get(i));
+                    if (swapped < now - 1e-6) {
+                        result.put(i, nk);
+                        result.put(k, ni);
+                        improved = true;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -562,13 +609,14 @@ public final class ApplyAction {
         OsmBuilding partner = c.getMatch().getPartner();
         if (c.isReplacement() && replaceable(c)) {
             // wie bei der Übernahme: gemeinsame Ecken der Angleichungsgruppe liegen dann schon auf ALKIS
-            Command corners = groupCornerMoves(alignmentGroup(c, session), crs);
+            List<Candidate> group = alignmentGroup(c, session);
+            Command corners = groupCornerMoves(group, crs);
             if (corners == null) {
-                return fitReplacement(c, session);
+                return fitReplacement(c, session, groupWays(group), java.util.Collections.emptySet());
             }
             corners.executeCommand();
             try {
-                return fitReplacement(c, session);
+                return fitReplacement(c, session, groupWays(group), java.util.Collections.emptySet());
             } finally {
                 corners.undoCommand();
             }
@@ -583,18 +631,133 @@ public final class ApplyAction {
      * @param session Sitzung
      * @return Anpassung
      */
-    static NeighbourFitter.Result fitReplacement(Candidate c, AnalysisSession session) {
+    static NeighbourFitter.Result fitReplacement(Candidate c, AnalysisSession session, Set<OsmPrimitive> group,
+            Set<OsmPrimitive> replaced) {
         CrsTransformer crs = session.getCrs();
         double tol = AlkisSettings.FIT_TOLERANCE.get();
         Way old = (Way) c.getMatch().getPartner().getPrimitive();
+        // Nachbarn, die selbst noch an ALKIS angeglichen werden (offen oder später in dieser Gruppe),
+        // liegen falsch: nicht an sie anpassen. Sie schließen bei ihrer eigenen Angleichung an die dann
+        // amtlich liegenden Knoten an.
+        Set<OsmPrimitive> pending = pendingAlignment(session, crs, replaced);
+        Set<OsmPrimitive> onAlkis = alignedNeighbours(session, crs, replaced);
         List<NeighbourFitter.NeighbourWay> neighbours = new ArrayList<>();
         for (NeighbourFitter.NeighbourWay n : NeighbourWays.collect(session.getDataSet(), crs, boundsAround(c, tol + 1, crs))) {
-            if (n.getHandle() != old) {
-                neighbours.add(n);
+            boolean laterInGroup = group.contains(n.getHandle()) && !replaced.contains(n.getHandle());
+            if (n.getHandle() != old && !pending.contains(n.getHandle()) && !laterInGroup) {
+                // an amtlich liegende Nachbarn nur dort anschließen, wo ALKIS dieselbe Ecke/Kante hat
+                neighbours.add(onAlkis.contains(n.getHandle()) ? n.withTolerance(SAME_ALKIS_CORNER) : n);
             }
         }
-        return new NeighbourFitter(tol, AlkisSettings.isClipOverlaps()).fit(c.getGeometry(), neighbours,
-                NeighbourWays.keepNodes(old, crs));
+        // Knoten neben dem ALKIS-Umriss, die nur mit Gebäuden derselben Angleichungsgruppe geteilt werden,
+        // nicht festhalten: Die Gebäude werden im selben Schritt angeglichen und schließen an den gemeinsamen
+        // ALKIS-Ecken an. Gemeinsame Knoten auf dem Umriss bleiben erhalten (Knotenhistorie).
+        Geometry boundary = c.getGeometry().getBoundary();
+        List<NeighbourFitter.KeepNode> keep = new ArrayList<>();
+        for (NeighbourFitter.KeepNode k : NeighbourWays.keepNodes(old, crs)) {
+            boolean offOutline = boundary.distance(GeometryComparator.FACTORY.createPoint(
+                    new org.locationtech.jts.geom.Coordinate(k.x, k.y))) > ON_ALKIS;
+            if (!offOutline || !onlySharedWith(k, old, group)) {
+                keep.add(k);
+            }
+        }
+        return new NeighbourFitter(tol, AlkisSettings.isClipOverlaps()).fit(c.getGeometry(), neighbours, keep);
+    }
+
+    /**
+     * @return OSM-Gebäude offener Einträge, die sich ersetzen lassen, aber noch nicht auf ihrem
+     *         ALKIS-Umriss liegen (ohne die im laufenden Schritt bereits ersetzten)
+     */
+    static Set<OsmPrimitive> pendingAlignment(AnalysisSession session, CrsTransformer crs, Set<OsmPrimitive> replaced) {
+        Set<OsmPrimitive> pending = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        for (Candidate o : session.getCandidates()) {
+            if (awaitsAlignment(o, crs) && !replaced.contains(o.getMatch().getPartner().getPrimitive())) {
+                pending.add(o.getMatch().getPartner().getPrimitive());
+            }
+        }
+        return pending;
+    }
+
+    /**
+     * @return ob ein offener Eintrag sein OSM-Gebäude noch an ALKIS angleichen soll (übernehmbare
+     *         Empfehlung, liegt noch nicht auf ALKIS). Identische Gebäude mit „Nichts zu tun“ zählen nicht.
+     */
+    static boolean awaitsAlignment(Candidate o, CrsTransformer crs) {
+        return isOpen(o) && replaceable(o) && o.getRecommendation() != null && o.getRecommendation().isApplicable()
+                && !atAlkis(o, crs);
+    }
+
+    /**
+     * @return OSM-Gebäude, die bereits auf ALKIS liegen: übernommene Einträge, im laufenden Schritt
+     *         ersetzte Gebäude und Gebäude, deren Knoten exakt auf ihrem ALKIS-Umriss liegen
+     */
+    static Set<OsmPrimitive> alignedNeighbours(AnalysisSession session, CrsTransformer crs, Set<OsmPrimitive> replaced) {
+        Set<OsmPrimitive> aligned = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        aligned.addAll(replaced);
+        for (Candidate o : session.getCandidates()) {
+            if (replaceable(o) && (o.getStatus() == Candidate.Status.UEBERNOMMEN || atAlkis(o, crs))) {
+                aligned.add(o.getMatch().getPartner().getPrimitive());
+            }
+        }
+        return aligned;
+    }
+
+    /** @return ob der Knoten ohne Tags ist und außer {@code old} nur zu Gebäuden der Gruppe gehört */
+    private static boolean onlySharedWith(NeighbourFitter.KeepNode k, Way old, Set<OsmPrimitive> group) {
+        if (!(k.getNode() instanceof Node)) {
+            return false;
+        }
+        Node n = (Node) k.getNode();
+        if (n.hasKeys()) {
+            return false;
+        }
+        for (OsmPrimitive ref : n.getReferrers()) {
+            if (ref != old && !group.contains(ref)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** @return OSM-Gebäude der Gruppenmitglieder */
+    private static Set<OsmPrimitive> groupWays(List<Candidate> group) {
+        Set<OsmPrimitive> ways = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        group.forEach(m -> ways.add(m.getMatch().getPartner().getPrimitive()));
+        return ways;
+    }
+
+    private static boolean isOpen(Candidate o) {
+        return o.getStatus() == Candidate.Status.OFFEN || o.getStatus() == Candidate.Status.UEBERSPRUNGEN;
+    }
+
+    /** Abstand (m), bis zu dem ein OSM-Knoten als „liegt auf ALKIS“ gilt. */
+    private static final double ON_ALKIS = 0.01;
+
+    /**
+     * @return ob das OSM-Gebäude des Eintrags schon auf dem ALKIS-Umriss liegt (alle Knoten auf dem
+     *         Umriss, jede ALKIS-Ecke mit einem Knoten besetzt)
+     */
+    static boolean atAlkis(Candidate o, CrsTransformer crs) {
+        Way w = (Way) o.getMatch().getPartner().getPrimitive();
+        Geometry boundary = o.getGeometry().getBoundary();
+        List<double[]> nodes = new ArrayList<>();
+        for (Node n : w.getNodes()) {
+            if (!n.isLatLonKnown()) {
+                return false;
+            }
+            org.openstreetmap.josm.data.coor.EastNorth en = crs.toProjected(n);
+            if (boundary.distance(GeometryComparator.FACTORY.createPoint(
+                    new org.locationtech.jts.geom.Coordinate(en.east(), en.north()))) > ON_ALKIS) {
+                return false;
+            }
+            nodes.add(new double[] {en.east(), en.north()});
+        }
+        for (double[] corner : alkisVertices(o)) {
+            if (nearestPoint(nodes, corner[0], corner[1], ON_ALKIS) == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** @return ob die Geometrie des OSM-Partners durch ALKIS ersetzt werden kann */
@@ -633,6 +796,14 @@ public final class ApplyAction {
         java.util.ArrayDeque<Candidate> queue = new java.util.ArrayDeque<>(group);
         while (!queue.isEmpty()) {
             Candidate m = queue.poll();
+            // Nachbarn, die laut ALKIS angrenzen, in OSM aber noch abweichend liegen, gleich mit angleichen:
+            // sonst würde das Gebäude neben ihnen amtlich liegen, sie selbst aber getrennt davon bleiben
+            for (Candidate o : byPartner.values()) {
+                if (!group.contains(o) && touchesInAlkis(m, o, tol) && awaitsAlignment(o, crs)) {
+                    group.add(o);
+                    queue.add(o);
+                }
+            }
             Way w = (Way) m.getMatch().getPartner().getPrimitive();
             List<double[]> corners = alkisVertices(m);
             for (Node n : new LinkedHashSet<>(w.getNodes())) {
@@ -655,6 +826,20 @@ public final class ApplyAction {
             }
         }
         return group;
+    }
+
+    /**
+     * @return ob sich die ALKIS-Umrisse zweier Einträge berühren und das OSM-Gebäude von {@code o} so nah
+     *         an {@code m} liegt, dass es dessen Anpassung beeinflussen würde
+     */
+    private static boolean touchesInAlkis(Candidate m, Candidate o, double tol) {
+        return m.getGeometry().distance(o.getGeometry()) <= SAME_ALKIS_CORNER
+                && m.getGeometry().distance(o.getMatch().getPartner().getGeometry()) <= tol;
+    }
+
+    private static double distance(CrsTransformer crs, Node n, double[] p) {
+        org.openstreetmap.josm.data.coor.EastNorth en = crs.toProjected(n);
+        return Math.hypot(en.east() - p[0], en.north() - p[1]);
     }
 
     /** Abstand (m), bis zu dem zwei ALKIS-Eckpunkte als dieselbe Ecke gelten. */

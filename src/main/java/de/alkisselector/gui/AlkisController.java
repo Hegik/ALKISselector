@@ -33,6 +33,7 @@ public final class AlkisController implements LayerChangeListener {
     private AlkisPreviewLayer layer;
     private ReviewDialog dialog;
     private boolean listening;
+    private AlkisReviewMapMode reviewMode;
     /** Profile mit ungeprüfter Lizenz, deren Warnung in dieser Sitzung bestätigt wurde. */
     private final Set<String> confirmedUnverified = new HashSet<>();
 
@@ -48,6 +49,16 @@ public final class AlkisController implements LayerChangeListener {
     /** @param dialog Review-Dialog des aktuellen Kartenfensters (oder {@code null}) */
     public void setDialog(ReviewDialog dialog) {
         this.dialog = dialog;
+    }
+
+    /** @return Review-Dialog des aktuellen Kartenfensters oder {@code null} */
+    public ReviewDialog getDialog() {
+        return dialog;
+    }
+
+    /** @param reviewMode Prüfmodus, in den nach einer Ausschnitt-Analyse gewechselt wird */
+    public void setReviewMode(AlkisReviewMapMode reviewMode) {
+        this.reviewMode = reviewMode;
     }
 
     /** @return aktuelle Sitzung oder {@code null} */
@@ -69,15 +80,14 @@ public final class AlkisController implements LayerChangeListener {
             return;
         }
         Bounds view = MainApplication.getMap().mapView.getRealBounds();
-        if (!isCovered(ds, view)) {
-            int answer = JOptionPane.showConfirmDialog(MainApplication.getMainFrame(),
-                    "<html>Für den sichtbaren Ausschnitt sind nicht vollständig OSM-Daten geladen.<br>"
-                            + "Gebäude außerhalb der geladenen Daten würden fälschlich als „neu“ eingestuft.<br><br>"
-                            + "Trotzdem fortfahren?</html>",
-                    "ALKISselector", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (answer != JOptionPane.YES_OPTION) {
-                return;
-            }
+        // Gebäude außerhalb der heruntergeladenen Bereiche überspringt die Analyse (LoadedArea).
+        if (ds.getDataSourceBounds().stream().noneMatch(b -> b.intersects(view))) {
+            JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
+                    "<html>Für den sichtbaren Ausschnitt sind keine OSM-Daten heruntergeladen.<br>"
+                            + "Übernommen werden nur ALKIS-Gebäude, die vollständig im heruntergeladenen Bereich liegen.<br>"
+                            + "Bitte zuerst OSM-Daten für diesen Bereich herunterladen.</html>",
+                    "ALKISselector", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
         ServiceProfile p = ProfileStore.getInstance().getActiveProfile();
         if (!confirmUnverified(p)) {
@@ -141,21 +151,6 @@ public final class AlkisController implements LayerChangeListener {
         return ds;
     }
 
-    private static boolean isCovered(DataSet ds, Bounds view) {
-        if (ds.getDataSourceBounds().isEmpty()) {
-            return false;
-        }
-        LatLon[] corners = {view.getMin(), view.getMax(), new LatLon(view.getMinLat(), view.getMaxLon()),
-                new LatLon(view.getMaxLat(), view.getMinLon()), view.getCenter()};
-        for (LatLon c : corners) {
-            boolean inside = ds.getDataSourceBounds().stream().anyMatch(b -> b.contains(c));
-            if (!inside) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Zeigt das Ergebnis einer Analyse an (wird im EDT aufgerufen).
      * @param newSession Ergebnis
@@ -190,6 +185,15 @@ public final class AlkisController implements LayerChangeListener {
         }
         if (!merge) {
             notifyUser(summary(session));
+            enterReviewMode();
+        }
+    }
+
+    /** Wechselt nach einer Ausschnitt-Analyse in den Prüfmodus, damit die Tasten sofort gelten. */
+    private void enterReviewMode() {
+        org.openstreetmap.josm.gui.MapFrame map = MainApplication.getMap();
+        if (reviewMode != null && map != null && map.mapMode != reviewMode && !session.getCandidates().isEmpty()) {
+            map.selectMapMode(reviewMode);
         }
     }
 
@@ -330,6 +334,10 @@ public final class AlkisController implements LayerChangeListener {
                 .append(open).append(" davon übernehmbar.");
         if (s.getExcludedCount() > 0) {
             sb.append("<br>").append(s.getExcludedCount()).append(" Bauteile/unterirdische Objekte ausgeblendet.");
+        }
+        if (s.getOutsideCount() > 0) {
+            sb.append("<br>").append(s.getOutsideCount())
+                    .append(" Gebäude übersprungen, weil sie nicht vollständig im heruntergeladenen OSM-Bereich liegen.");
         }
         if (s.isTruncated()) {
             sb.append("<br><b>Achtung:</b> Der Dienst hat nicht alle Objekte geliefert – Ausschnitt verkleinern.");

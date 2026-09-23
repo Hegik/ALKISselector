@@ -17,6 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -24,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.openstreetmap.josm.command.Command;
@@ -32,6 +34,7 @@ import org.openstreetmap.josm.data.UndoRedoHandler;
 import org.openstreetmap.josm.data.coor.LatLon;
 import org.openstreetmap.josm.data.osm.BBox;
 import org.openstreetmap.josm.gui.MainApplication;
+import org.openstreetmap.josm.gui.util.GuiHelper;
 import org.openstreetmap.josm.gui.Notification;
 import org.openstreetmap.josm.gui.SideButton;
 import org.openstreetmap.josm.gui.dialogs.ToggleDialog;
@@ -60,7 +63,7 @@ import de.alkisselector.ortho.OrthoResult;
  * <li>Leertaste – überspringen</li>
  * </ul>
  */
-public final class ReviewDialog extends ToggleDialog {
+public final class ReviewDialog extends ToggleDialog implements UndoRedoHandler.CommandQueuePreciseListener {
 
     private static final String KEYS_HELP = "<small>Enter = übernehmen · Umschalt+Enter = trotz Diskrepanz übernehmen · "
             + "Entf = verwerfen · Leertaste = überspringen · V = alt/neu umschalten</small>";
@@ -75,13 +78,22 @@ public final class ReviewDialog extends ToggleDialog {
     private final TagTableModel tagModel = new TagTableModel();
     private final JTable tagTable = new JTable(tagModel);
 
-    private final DecisionAction acceptAction = new DecisionAction("Übernehmen", "ok", Decision.ACCEPT);
-    private final DecisionAction forceAction = new DecisionAction("Trotzdem übernehmen", "ok", Decision.FORCE);
-    private final DecisionAction rejectAction = new DecisionAction("Verwerfen", "cancel", Decision.REJECT);
-    private final DecisionAction skipAction = new DecisionAction("Überspringen", "dialogs/next", Decision.SKIP);
-    private final DecisionAction undoAction = new DecisionAction("Zurücksetzen", "undo", Decision.UNDO);
+    private final DecisionAction acceptAction = new DecisionAction("Übernehmen", "ok", Decision.ACCEPT,
+            "Vorschlag übernehmen", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+    private final DecisionAction forceAction = new DecisionAction("Trotzdem übernehmen", "ok", Decision.FORCE,
+            "Auch gegen die Empfehlung übernehmen", KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK));
+    private final DecisionAction rejectAction = new DecisionAction("Verwerfen", "cancel", Decision.REJECT,
+            "Nicht übernehmen und als verworfen markieren", KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+    private final DecisionAction skipAction = new DecisionAction("Überspringen", "dialogs/next", Decision.SKIP,
+            "Später entscheiden, weiter zum nächsten Eintrag", KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0));
+    private final DecisionAction undoAction = new DecisionAction("Zurücksetzen", "undo", Decision.UNDO,
+            "Entscheidung zurücknehmen, Eintrag wieder offen", KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
+    private static final KeyStroke REPORT_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_M, 0);
+    private final ReportAction reportAction = new ReportAction();
 
     private AnalysisSession session;
+    /** Eintrag, dessen Übernahme einen Befehl ausgelöst hat (für die Auswahl nach Strg+Z). */
+    private final java.util.Map<Command, Candidate> primaryByCommand = new java.util.IdentityHashMap<>();
 
     /** Erzeugt das Seitenfenster. */
     public ReviewDialog() {
@@ -90,6 +102,7 @@ public final class ReviewDialog extends ToggleDialog {
                 300);
         buildList();
         buildTagTable();
+        UndoRedoHandler.getInstance().addCommandQueuePreciseListener(this);
         JPanel top = new JPanel(new BorderLayout(4, 2));
         top.add(filter, BorderLayout.NORTH);
         top.add(new JScrollPane(list), BorderLayout.CENTER);
@@ -109,7 +122,8 @@ public final class ReviewDialog extends ToggleDialog {
 
         createLayout(split, false, Arrays.asList(
                 new SideButton(acceptAction), new SideButton(forceAction), new SideButton(rejectAction),
-                new SideButton(skipAction), new SideButton(undoAction), new SideButton(AlkisActions.TOGGLE_VIEW)));
+                new SideButton(skipAction), new SideButton(undoAction), new SideButton(AlkisActions.TOGGLE_VIEW),
+                new SideButton(reportAction)));
         filter.addActionListener(e -> {
             Candidate current = getSelectedCandidate();
             listModel.setFilter((CandidateTableModel.Filter) filter.getSelectedItem());
@@ -135,10 +149,10 @@ public final class ReviewDialog extends ToggleDialog {
                 onSelectionChanged(true);
             }
         });
-        bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "alkis-accept", acceptAction);
-        bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK), "alkis-force", forceAction);
-        bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "alkis-reject", rejectAction);
-        bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "alkis-skip", skipAction);
+        for (DecisionAction a : new DecisionAction[] {acceptAction, forceAction, rejectAction, skipAction, undoAction}) {
+            bind(list, a.keyStroke, "alkis-" + a.decision.name().toLowerCase(java.util.Locale.ROOT), a);
+        }
+        bind(list, REPORT_KEY, "alkis-report", reportAction);
         bind(list, KeyStroke.getKeyStroke(KeyEvent.VK_V, 0), "alkis-toggle-view", AlkisActions.TOGGLE_VIEW);
     }
 
@@ -192,6 +206,42 @@ public final class ReviewDialog extends ToggleDialog {
         }
         select(select != null ? select : listModel.get(0), true);
         updateHeader();
+    }
+
+    /**
+     * Führt die Entscheidungsaktion zu einer Taste aus (Prüfmodus, unabhängig vom Fokus).
+     * @param ks Taste
+     * @return ob die Taste zu einer Aktion gehört (auch wenn diese gerade deaktiviert ist)
+     */
+    boolean handleReviewKey(KeyStroke ks) {
+        Object name = list.getInputMap(JComponent.WHEN_FOCUSED).get(ks);
+        javax.swing.Action a = name != null ? list.getActionMap().get(name) : null;
+        if (a == null) {
+            return false;
+        }
+        if (a.isEnabled()) {
+            a.actionPerformed(new ActionEvent(list, ActionEvent.ACTION_PERFORMED, String.valueOf(name)));
+        }
+        return true;
+    }
+
+    /**
+     * Wählt einen Eintrag aus, ohne die Karte zu verschieben (Klick im Prüfmodus).
+     * @param c Eintrag
+     */
+    void selectCandidate(Candidate c) {
+        if (listModel.indexOf(c) < 0) {
+            filter.setSelectedItem(CandidateTableModel.Filter.ALLE);
+        }
+        select(c, false);
+    }
+
+    /**
+     * @param c Komponente
+     * @return ob die Komponente in der Tag-Tabelle liegt (dort behalten Enter und Leertaste ihre Bedeutung)
+     */
+    boolean isInTagTable(java.awt.Component c) {
+        return c != null && SwingUtilities.isDescendingFrom(c, tagTable);
     }
 
     /** @return ausgewählter Kandidat oder {@code null} */
@@ -505,6 +555,7 @@ public final class ReviewDialog extends ToggleDialog {
                 return false;
             }
             // mit angeglichene Nachbargebäude sind damit ebenfalls erledigt
+            primaryByCommand.put(cmd, c);
             for (Candidate m : action.getAppliedGroup()) {
                 m.setAppliedCommand(cmd);
                 m.setStatus(Candidate.Status.UEBERNOMMEN);
@@ -521,20 +572,12 @@ public final class ReviewDialog extends ToggleDialog {
         if (c.getStatus() == Candidate.Status.UEBERNOMMEN) {
             Command applied = c.getAppliedCommand();
             if (applied != null && UndoRedoHandler.getInstance().getLastCommand() == applied) {
+                // setzt über commandUndone alle gemeinsam übernommenen Einträge wieder auf „offen“
                 UndoRedoHandler.getInstance().undo();
             } else {
                 notify("Seit der Übernahme wurden weitere Änderungen gemacht – bitte über Bearbeiten → Rückgängig zurücknehmen.");
-                return;
             }
-            // gemeinsam angeglichene Gebäude werden mit zurückgesetzt
-            for (Candidate m : session.getCandidates()) {
-                if (m != c && m.getAppliedCommand() == applied) {
-                    m.setAppliedCommand(null);
-                    m.setStatus(Candidate.Status.OFFEN);
-                    DecisionLog.log(session, m, Candidate.Status.OFFEN);
-                }
-            }
-            c.setAppliedCommand(null);
+            return;
         }
         c.setStatus(Candidate.Status.OFFEN);
         c.setShownSince(System.currentTimeMillis());
@@ -590,23 +633,121 @@ public final class ReviewDialog extends ToggleDialog {
 
     @Override
     public void destroy() {
+        UndoRedoHandler.getInstance().removeCommandQueuePreciseListener(this);
         AlkisController.getInstance().setDialog(null);
         super.destroy();
     }
 
-    /** Aktion für eine Entscheidung. */
+    // --- Rückgängig/Wiederholen in JOSM (Strg+Z / Strg+Y) mit dem Status der Einträge abgleichen
+
+    @Override
+    public void commandAdded(UndoRedoHandler.CommandAddedEvent e) {
+        // nichts: Übernahmen setzen ihren Status selbst
+    }
+
+    @Override
+    public void cleaned(UndoRedoHandler.CommandQueueCleanedEvent e) {
+        // nichts: ohne Befehl im Stapel bleibt der Status, wie er ist
+    }
+
+    @Override
+    public void commandUndone(UndoRedoHandler.CommandUndoneEvent e) {
+        GuiHelper.runInEDT(() -> applyUndoRedo(e.getCommand(), true));
+    }
+
+    @Override
+    public void commandRedone(UndoRedoHandler.CommandRedoneEvent e) {
+        GuiHelper.runInEDT(() -> applyUndoRedo(e.getCommand(), false));
+    }
+
+    /**
+     * Setzt die mit einem Befehl übernommenen Einträge nach Rückgängig wieder auf „offen“ bzw. nach
+     * Wiederholen wieder auf „übernommen“. Der Befehl bleibt am Eintrag, damit Wiederholen ihn findet.
+     */
+    private void applyUndoRedo(Command cmd, boolean undone) {
+        if (session == null || cmd == null) {
+            return;
+        }
+        Candidate.Status from = undone ? Candidate.Status.UEBERNOMMEN : Candidate.Status.OFFEN;
+        Candidate.Status to = undone ? Candidate.Status.OFFEN : Candidate.Status.UEBERNOMMEN;
+        boolean changed = false;
+        for (Candidate m : session.getCandidates()) {
+            if (m.getAppliedCommand() == cmd && m.getStatus() == from) {
+                m.setStatus(to);
+                if (undone) {
+                    m.setShownSince(System.currentTimeMillis());
+                }
+                DecisionLog.log(session, m, to);
+                changed = true;
+            }
+        }
+        if (!changed) {
+            return;
+        }
+        listModel.refresh();
+        updateHeader();
+        Candidate primary = primaryByCommand.get(cmd);
+        if (undone && primary != null) {
+            if (listModel.indexOf(primary) < 0) {
+                filter.setSelectedItem(CandidateTableModel.Filter.ALLE);
+            }
+            // der zurückgenommene Eintrag steht wieder zur Entscheidung, Enter übernimmt ihn erneut
+            select(primary, true);
+        } else {
+            onSelectionChanged(false);
+        }
+    }
+
+    /** Aktion für eine Entscheidung; der Tooltip nennt die zugehörige Taste. */
     private final class DecisionAction extends AbstractAction {
         private final Decision decision;
+        private final KeyStroke keyStroke;
 
-        DecisionAction(String name, String icon, Decision decision) {
+        DecisionAction(String name, String icon, Decision decision, String tooltip, KeyStroke keyStroke) {
             super(name);
             this.decision = decision;
+            this.keyStroke = keyStroke;
+            putValue(SHORT_DESCRIPTION, Shortcut.makeTooltip(tooltip, keyStroke));
             new ImageProvider(icon).getResource().attachImageIcon(this, true);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             decide(decision);
+        }
+    }
+
+    /** Hält den Zustand des ausgewählten Eintrags mit einem Kommentar als Problemmeldung fest. */
+    private final class ReportAction extends AbstractAction {
+        ReportAction() {
+            super("Problem melden");
+            putValue(SHORT_DESCRIPTION, Shortcut.makeTooltip(
+                    "Ausgewählten Eintrag mit Kommentar, OSM-Daten und Kartenbild als Problemmeldung speichern", REPORT_KEY));
+            new ImageProvider("dialogs/notes/note_new").getResource().attachImageIcon(this, true);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Candidate c = getSelectedCandidate();
+            javax.swing.JTextArea text = new javax.swing.JTextArea(6, 50);
+            text.setLineWrap(true);
+            text.setWrapStyleWord(true);
+            Object[] message = {"Was stimmt nicht? " + (c != null ? "(Eintrag: " + c.getTitle() + ")" : "(kein Eintrag ausgewählt)"),
+                new JScrollPane(text)};
+            int answer = JOptionPane.showConfirmDialog(MainApplication.getMainFrame(), message, "Problem melden",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (answer != JOptionPane.OK_OPTION) {
+                return;
+            }
+            try {
+                java.nio.file.Path dir = ProblemReport.write(session, c, text.getText());
+                AlkisController.getInstance().notifyUser("<html>Problemmeldung gespeichert:<br>" + dir + "</html>");
+            } catch (java.io.IOException ex) {
+                org.openstreetmap.josm.tools.Logging.warn(ex);
+                JOptionPane.showMessageDialog(MainApplication.getMainFrame(),
+                        "Problemmeldung konnte nicht gespeichert werden:\n" + ex.getMessage(), "ALKISselector",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
