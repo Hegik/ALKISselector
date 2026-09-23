@@ -16,6 +16,7 @@ import org.openstreetmap.josm.gui.layer.LayerManager.LayerChangeListener;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerOrderChangeEvent;
 import org.openstreetmap.josm.gui.layer.LayerManager.LayerRemoveEvent;
 
+import de.alkisselector.config.DefaultProfiles;
 import de.alkisselector.config.ProfileStore;
 import de.alkisselector.config.ServiceProfile;
 import de.alkisselector.decision.AnalysisSession;
@@ -32,6 +33,8 @@ public final class AlkisController implements LayerChangeListener {
     private AlkisPreviewLayer layer;
     private ReviewDialog dialog;
     private boolean listening;
+    /** Profile mit ungeprüfter Lizenz, deren Warnung in dieser Sitzung bestätigt wurde. */
+    private final Set<String> confirmedUnverified = new HashSet<>();
 
     private AlkisController() {
         // Singleton
@@ -77,7 +80,38 @@ public final class AlkisController implements LayerChangeListener {
             }
         }
         ServiceProfile p = ProfileStore.getInstance().getActiveProfile();
+        if (!confirmUnverified(p)) {
+            return;
+        }
         MainApplication.worker.submit(new AnalysisTask(p, view, ds));
+    }
+
+    /**
+     * Warnt einmal je Sitzung und Profil, wenn der Gebäude-Dienst nicht zu einem mitgelieferten,
+     * rechtlich geprüften Profil gehört.
+     * @param p aktives Profil
+     * @return ob die Analyse fortgesetzt werden soll
+     */
+    private boolean confirmUnverified(ServiceProfile p) {
+        if (DefaultProfiles.isVerified(p) || confirmedUnverified.contains(p.getName())) {
+            return true;
+        }
+        int answer = JOptionPane.showConfirmDialog(MainApplication.getMainFrame(),
+                "<html><b>Die Nutzung dieser Daten für OpenStreetMap ist unter Umständen nicht erlaubt.</b><br><br>"
+                        + "Das Profil „" + escape(p.getName()) + "“ nutzt keinen der mitgelieferten Dienste, deren "
+                        + "Lizenz geprüft ist.<br>Übernehmen Sie nur Daten, deren Lizenz mit der ODbL vereinbar ist "
+                        + "oder für die<br>eine ausdrückliche Erlaubnis für OpenStreetMap vorliegt "
+                        + "(siehe wiki.openstreetmap.org/wiki/Contributors).<br><br>Trotzdem fortfahren?</html>",
+                "ALKISselector – Lizenz ungeprüft", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (answer != JOptionPane.YES_OPTION) {
+            return false;
+        }
+        confirmedUnverified.add(p.getName());
+        return true;
+    }
+
+    private static String escape(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /**
@@ -90,6 +124,9 @@ public final class AlkisController implements LayerChangeListener {
             return;
         }
         ServiceProfile p = ProfileStore.getInstance().getActiveProfile();
+        if (!confirmUnverified(p)) {
+            return;
+        }
         MainApplication.worker.submit(new AnalysisTask(p, point, ds));
     }
 

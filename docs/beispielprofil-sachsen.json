@@ -1,7 +1,7 @@
 {
   "name": "Sachsen (GeoSN)",
-  "description": "ALKIS vereinfacht (WFS) und DOP 20 cm (WMS) des Staatsbetriebs Geobasisinformation und Vermessung Sachsen. Nutzungsbedingungen: https://geoportal.sachsen.de/nutzungsbedingungen.html – OSM-Kompatibilität vor der Nutzung prüfen!",
-  "sourceTag": "GeoSN: ALKIS, DOP",
+  "description": "ALKIS vereinfacht (WFS) und DOP 20 cm (WMS) des Staatsbetriebs Geobasisinformation und Vermessung Sachsen. Lizenz: dl-de/by-2-0 mit ausdrücklicher Erlaubnis für OpenStreetMap (https://wiki.openstreetmap.org/wiki/GeoSN_Open_Data). Minimalprofil als Importbeispiel, das mitgelieferte Profil „Sachsen (GeoSN)“ ist vollständiger.",
+  "sourceTag": "Landesamt für Geobasisinformation Sachsen (GeoSN), Datenlizenz Deutschland Namensnennung 2.0: ALKIS, DOP",
   "wfs": {
     "url": "https://geodienste.sachsen.de/aaa/public_alkis/vereinf/wfs",
     "version": "2.0.0",

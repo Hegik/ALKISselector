@@ -34,7 +34,7 @@ Ein Minimalprofil braucht deshalb nur die Dienst-URLs.
 
 Die GML-Antwort wird schemaunabhängig gelesen: Jedes einfache Unterelement eines Features wird zu
 einem Attribut (lokaler Name → Text), Flächen werden aus `gml:Polygon`/`gml:PolygonPatch` gelesen.
-Dienste mit **eigenem Schema** (z. B. Berlin `alkis_gebaeude:gebaeude`) sollten daher ebenfalls funktionieren (noch nicht getestet).
+Dienste mit **eigenem Schema** funktionieren daher ebenfalls, z. B. Berlin (`alkis_gebaeude:gebaeude`, siehe mitgeliefertes Profil).
 Es müssen dann nur die Attributnamen in Tabelle und Regeln angepasst werden.
 
 ### Orthophoto (WMS)
@@ -100,7 +100,8 @@ weitere Länder im Team oder im Repository teilen.
 ## Checkliste für ein neues Bundesland
 
 - [ ] Lizenz der ALKIS- und DOP-Daten auf OSM-Kompatibilität prüfen, z. B. dl-de/zero-2.0 (ja)
-      oder dl-de/by-2.0 (nur mit ausdrücklicher Erlaubnis bzw. Wiki-Eintrag).
+      oder dl-de/by-2.0 (nur mit ausdrücklicher Erlaubnis bzw. Wiki-Eintrag). Den Stand für alle
+      Länder zeigt [bundeslaender.md](bundeslaender.md).
 - [ ] WFS mit Gebäuden finden (Stichwort „ALKIS vereinfacht“) und das CRS notieren.
 - [ ] DOP-WMS finden und prüfen, ob das gleiche CRS unterstützt wird.
 - [ ] Profil anlegen, mit *prüfen* testen und einen kleinen Ausschnitt analysieren.

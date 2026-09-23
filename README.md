@@ -25,7 +25,7 @@ einen Dienst oder ein Land gebunden.
 | **Geometrie ersetzen** | Bei abweichenden Gebäuden bleiben ID, Historie und Tags erhalten, Tags werden nur ergänzt. Verbindungen zu angrenzenden Gebäuden, Wegen und Eingängen bleiben erhalten. Am Haus endende Zäune, Mauern und Wege werden bis zur ALKIS-Fassade verlängert oder gekürzt, damit die Wand keinen Knick bekommt |
 | **ALKIS-Karte** | ALKIS-WMS als Ebene zum visuellen Abgleich: 50 % Deckkraft, liegt automatisch immer über dem Luftbild |
 | **Flurstücke** | Nur als Hintergrundebene, werden nie übernommen |
-| **Profile** | Beliebige WFS/WMS-Dienste. Mitgeliefert: NRW, Beispiel Sachsen in `docs/` |
+| **Profile** | Beliebige WFS/WMS-Dienste. Mitgeliefert für alle Länder, deren ALKIS-Gebäude in OSM verwendet werden dürfen: Berlin, Brandenburg, Hamburg, Hessen, Mecklenburg-Vorpommern, NRW, Rheinland-Pfalz, Sachsen ([Übersicht](docs/bundeslaender.md)). Bei anderen Diensten erscheint ein Hinweis, dass die Nutzung unter Umständen nicht erlaubt ist |
 | **Evaluierung** | Jede Entscheidung landet als CSV-Zeile im Entscheidungsprotokoll |
 
 Jede Übernahme ist **ein** Undo-Schritt (Strg+Z). Die Quelle wird als Changeset-Tag `source=*`
@@ -40,7 +40,7 @@ eigene Gradle-Installation ist nicht nötig.
 ./gradlew build        # Plugin bauen + Unit-Tests  → build/libs/alkisselector.jar
 ./gradlew runJosm      # JOSM mit Plugin in eigenem Testprofil (build/josm-home) starten
 ./gradlew runJosm -Pjosm.args="--language=de --download=51.9612,7.6075,51.9635,7.6120"
-./gradlew test -Donline=true   # zusätzlich Online-Tests gegen die NRW-Dienste inkl. Kalibrierung
+./gradlew test -Donline=true   # zusätzlich Online-Tests gegen die Dienste aller Profile inkl. Kalibrierung
 ```
 
 In **PowerShell** Argumente mit Punkt in einfache Anführungszeichen setzen, sonst trennt PowerShell
@@ -66,12 +66,15 @@ automatisch angeboten.
 > **Wichtig:** Werden ALKIS-Daten in größerem Umfang übernommen, gilt das als Import im Sinne der
 > [OSM Import Guidelines](https://wiki.openstreetmap.org/wiki/Import/Guidelines). Das bedeutet:
 > Dokumentation im Wiki, Abstimmung mit der deutschen Community (Forum) und ein eigener Import-Account.
-> Die Lizenz der jeweiligen ALKIS-Daten muss OSM-kompatibel sein. Für NRW ist das mit
-> dl-de/zero-2.0 gegeben, für andere Länder im Einzelfall prüfen.
+> Die Lizenz der jeweiligen ALKIS-Daten muss OSM-kompatibel sein. Welche Länder das erfüllen, steht in
+> [docs/bundeslaender.md](docs/bundeslaender.md). Baden-Württemberg, Bayern, Bremen, Saarland,
+> Schleswig-Holstein und Thüringen haben derzeit keine Freigabe für ALKIS, in Niedersachsen und
+> Sachsen-Anhalt ist sie nicht eindeutig.
 
 ## Dokumentation
 
 - [docs/architektur.md](docs/architektur.md): Aufbau des Plugins und Algorithmen
+- [docs/bundeslaender.md](docs/bundeslaender.md): Rechtslage je Bundesland und mitgelieferte Profile
 - [docs/eigene-dienste-einbinden.md](docs/eigene-dienste-einbinden.md): eigene WFS/WMS konfigurieren
 - [docs/evaluierung.md](docs/evaluierung.md): Kalibrierung des Luftbild-Schwellenwerts, Vorgehen für die Evaluierung
 

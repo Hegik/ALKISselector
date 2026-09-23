@@ -2,6 +2,7 @@
 package de.alkisselector.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
@@ -30,6 +31,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 
@@ -68,6 +71,7 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
     private final JTextField wfsUrl = new JTextField(25);
     private final JComboBox<String> wfsVersion = new JComboBox<>(new String[] {"2.0.0", "1.1.0"});
     private final JTextField typeName = new JTextField(20);
+    private final JLabel licenseWarning = new JLabel();
     private final JTextField crs = new JTextField(12);
     private final JCheckBox swapAxes = new JCheckBox("Achsen vertauschen (Nord/Ost)");
     private final JSpinner pageSize = new JSpinner(new SpinnerNumberModel(1000, 1, 100_000, 100));
@@ -142,7 +146,28 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         top.add(button("Löschen", this::deleteProfile));
         top.add(button("Importieren …", this::importProfiles));
         top.add(button("Exportieren …", this::exportProfile));
+        top.add(button("Standardprofile ergänzen", this::addMissingDefaults));
         p.add(top, GBC.eol().fill(GBC.HORIZONTAL));
+        licenseWarning.setForeground(new Color(0xB00020));
+        p.add(licenseWarning, GBC.eol().fill(GBC.HORIZONTAL).insets(4, 4, 4, 4));
+        DocumentListener checkLicense = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateLicenseWarning();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateLicenseWarning();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateLicenseWarning();
+            }
+        };
+        wfsUrl.getDocument().addDocumentListener(checkLicense);
+        typeName.getDocument().addDocumentListener(checkLicense);
         profileCombo.addActionListener(e -> {
             if (!switching && profileCombo.getSelectedItem() != null && profileCombo.getSelectedItem() != current) {
                 store();
@@ -293,6 +318,17 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         lookupAttributes.setText(String.join(", ", p.getTagMapping().getLookupAttributes()));
         defaultBuilding.setText(p.getTagMapping().getDefaultValue());
         mappingModel.setEntries(p.getTagMapping().getTable());
+        updateLicenseWarning();
+    }
+
+    /** Zeigt einen Hinweis, wenn der Gebäude-Dienst nicht zu einem geprüften Standardprofil gehört. */
+    private void updateLicenseWarning() {
+        ServiceProfile probe = new ServiceProfile();
+        probe.setWfsUrl(wfsUrl.getText());
+        probe.setBuildingTypeName(typeName.getText().strip());
+        licenseWarning.setText(DefaultProfiles.isVerified(probe) ? ""
+                : "<html><b>Achtung:</b> Für diesen Dienst ist nicht geprüft, ob die Daten in OpenStreetMap verwendet "
+                        + "werden dürfen. Die Nutzung ist unter Umständen nicht erlaubt.</html>");
     }
 
     private void store() {
@@ -391,6 +427,23 @@ public class AlkisPreferenceSetting extends DefaultTabPreferenceSetting {
         ServiceProfile next = working.get(0);
         profileCombo.setSelectedItem(next);
         load(next);
+    }
+
+    /** Fügt mitgelieferte Profile hinzu, deren Name noch nicht vorkommt; vorhandene bleiben unverändert. */
+    private void addMissingDefaults() {
+        store();
+        List<ServiceProfile> missing = new ArrayList<>();
+        for (ServiceProfile d : DefaultProfiles.all()) {
+            if (working.stream().noneMatch(w -> w.getName().equals(d.getName()))) {
+                missing.add(d);
+            }
+        }
+        if (missing.isEmpty()) {
+            JOptionPane.showMessageDialog(profileCombo, "Alle Standardprofile sind bereits vorhanden.");
+            return;
+        }
+        missing.forEach(this::addAndSelect);
+        JOptionPane.showMessageDialog(profileCombo, missing.size() + " Standardprofil(e) ergänzt.");
     }
 
     private void addAndSelect(ServiceProfile p) {
