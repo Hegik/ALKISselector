@@ -51,6 +51,14 @@ am Punkt:
 ./gradlew test '-Donline=true'
 ```
 
+Der Online-Test für **Berlin** scheitert mit dem Standard-Truststore von Java mit `PKIX path building
+failed`, weil Java das Wurzelzertifikat von `gdi.berlin.de` nicht kennt (siehe
+[bundeslaender.md](docs/bundeslaender.md)). Unter Windows den Zertifikatsspeicher des Systems nutzen:
+
+```powershell
+$env:JAVA_TOOL_OPTIONS = '-Djavax.net.ssl.trustStoreType=Windows-ROOT'; ./gradlew test '-Donline=true'
+```
+
 Installation in ein normales JOSM: `alkisselector.jar` in den JOSM-Plugin-Ordner kopieren und in den
 Einstellungen unter *Erweiterungen* aktivieren. Das Plugin `jts` wird benötigt und von JOSM
 automatisch angeboten.
