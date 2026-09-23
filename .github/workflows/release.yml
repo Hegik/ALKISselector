@@ -1,0 +1,58 @@
+# Baut das Plugin bei jedem Push auf main und legt die aktuelle alkisselector.jar in das
+# Release „latest“. Der Download-Link bleibt dadurch immer gleich:
+# https://github.com/Hegik/ALKISselector/releases/download/latest/alkisselector.jar
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Version bestimmen
+        id: version
+        run: |
+          base=$(grep '^plugin.version=' gradle.properties | cut -d= -f2)
+          echo "version=${base}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Bauen und testen
+        run: ./gradlew build "-Pplugin.version=${{ steps.version.outputs.version }}"
+
+      - name: Release „latest“ aktualisieren
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git tag -f latest
+          git push -f origin latest
+          notes="Aktueller Stand von main (${GITHUB_SHA::7}), Plugin-Version ${VERSION}.
+
+          Installation: alkisselector.jar in den JOSM-Plugin-Ordner kopieren und unter Einstellungen → Erweiterungen aktivieren."
+          if gh release view latest > /dev/null 2>&1; then
+            gh release edit latest --title "ALKISselector ${VERSION}" --notes "$notes"
+          else
+            gh release create latest --title "ALKISselector ${VERSION}" --notes "$notes" --latest
+          fi
+          gh release upload latest build/libs/alkisselector.jar --clobber

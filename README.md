@@ -59,6 +59,10 @@ failed`, weil Java das Wurzelzertifikat von `gdi.berlin.de` nicht kennt (siehe
 $env:JAVA_TOOL_OPTIONS = '-Djavax.net.ssl.trustStoreType=Windows-ROOT'; ./gradlew test '-Donline=true'
 ```
 
+Die aktuelle Plugindatei baut GitHub bei jedem Push auf `main` und legt sie unter
+[Releases](https://github.com/Hegik/ALKISselector/releases/tag/latest) ab
+([direkter Download](https://github.com/Hegik/ALKISselector/releases/download/latest/alkisselector.jar)).
+
 Installation in ein normales JOSM: `alkisselector.jar` in den JOSM-Plugin-Ordner kopieren und in den
 Einstellungen unter *Erweiterungen* aktivieren. Das Plugin `jts` wird benötigt und von JOSM
 automatisch angeboten.
